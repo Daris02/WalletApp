@@ -1,0 +1,509 @@
+openapi: 3.0.3
+info:
+  title: Wallet App API
+  version: 1.0.0
+  description: |
+    STD21099 ( L2 - H1 )
+servers:
+  - url: https://app.wallet.com
+tags:
+  - name: Currency
+  - name: Account
+  - name: Transaction
+paths:
+  /currency:        
+    get:
+      tags:
+        - "Currency"
+      summary: Get all currency
+      description: The returned currency are ordered by name.
+      operationId: getCurrency
+      responses:
+        200:
+          $ref: "#/components/responses/200_Response_Currency"
+        400:
+          $ref: "#/components/responses/400_Response"
+        403:
+          $ref: "#/components/responses/403_Response"
+        500:
+          $ref: "#/components/responses/500_Response"
+
+    post:
+      tags:
+        - "Currency"
+      summary: Create a list of new currency
+      description: The reutrned a list of new currency
+      operationId: createCurrency
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/CreateCurrency"
+      responses:
+        200:
+          $ref: "#/components/responses/200_Response_Currency"
+        400:
+          $ref: "#/components/responses/400_Response"
+        403:
+          $ref: "#/components/responses/403_Response"
+        500:
+          $ref: "#/components/responses/500_Response"
+    
+    put:
+      tags:
+        - "Currency"
+      summary: Update list of currency
+      description: The reutrned new currency
+      operationId: updateCurrency
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/Currency"
+      responses:
+        200:
+          $ref: "#/components/responses/200_Response_Currency"
+        400:
+          $ref: "#/components/responses/400_Response"
+        403:
+          $ref: "#/components/responses/403_Response"
+        500:
+          $ref: "#/components/responses/500_Response"
+    
+  /currency/{id}:
+    get:
+      tags:
+        - "Currency"
+      summary: Get currency by id
+      operationId: getCurrencyById
+      parameters:
+        - $ref: "#/components/parameters/CurrencyId"
+      responses:
+        200:
+          $ref: "#/components/responses/200_Response_Currency"
+        400:
+          $ref: "#/components/responses/400_Response"
+        403:
+          $ref: "#/components/responses/403_Response"
+        500:
+          $ref: "#/components/responses/500_Response"
+
+  
+  /accounts:
+    get:
+      tags:
+        - "Account"
+      summary: Get all accounts
+      description: The returned accounts are ordered by updated datetime.
+      operationId: getAccounts
+      responses:
+        200:
+          $ref: "#/components/responses/200_Response_Accounts"
+        400:
+          $ref: "#/components/responses/400_Response"
+        403:
+          $ref: "#/components/responses/403_Response"
+        500:
+          $ref: "#/components/responses/500_Response"
+    
+    post:
+      tags:
+        - "Account"
+      summary: Create a list of new accounts
+      description: The reutrned a list of new accounts
+      operationId: createAccounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/CreateAccount"
+      responses:
+        200:
+          $ref: "#/components/responses/200_Response_Accounts"
+        400:
+          $ref: "#/components/responses/400_Response"
+        403:
+          $ref: "#/components/responses/403_Response"
+        500:
+          $ref: "#/components/responses/500_Response"
+
+    put:
+      tags:
+        - "Account"
+      summary: Update list of account
+      description: The reutrned new account
+      operationId: updateAccount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/Account"
+      responses:
+        200:
+          $ref: "#/components/responses/200_Response_Accounts"
+        400:
+          $ref: "#/components/responses/400_Response"
+        403:
+          $ref: "#/components/responses/403_Response"
+        500:
+          $ref: "#/components/responses/500_Response"
+    
+  /accounts/{id}:
+    get:
+      tags:
+        - "Account"
+      summary: Get Account by id
+      operationId: getAccountById
+      parameters:
+        - $ref: "#/components/parameters/AccountId"
+      responses:
+        200:
+          $ref: "#/components/responses/200_Response_Accounts"
+        400:
+          $ref: "#/components/responses/400_Response"
+        403:
+          $ref: "#/components/responses/403_Response"
+        500:
+          $ref: "#/components/responses/500_Response"
+
+
+  /transactions/debit/{accountId}:
+    post:
+      tags:
+        - "Transaction"
+      summary: Debit an account
+      operationId: debitAccount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTransaction"
+      responses:
+        200:
+          $ref: "#/components/responses/200_Response_Accounts"
+        400:
+          $ref: "#/components/responses/400_Response"
+        403:
+          $ref: "#/components/responses/403_Response"
+        500:
+          $ref: "#/components/responses/500_Response"
+
+  /transactions/credit/{accountId}:
+    post:
+      tags:
+        - "Transaction"
+      summary: Credit an account
+      operationId: creditAccount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTransaction"
+      responses:
+        200:
+          $ref: "#/components/responses/200_Response_Transaction"
+        400:
+          $ref: "#/components/responses/400_Response"
+        403:
+          $ref: "#/components/responses/403_Response"
+        500:
+          $ref: "#/components/responses/500_Response"
+
+  /transactions/transfer/{accountSendId}/{accountReceiveId}:
+    post:
+      tags:
+        - "Transaction"
+      summary: Transefer to account from another account
+      operationId: transferToAccount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransferRequest"
+      responses:
+        200:
+          $ref: "#/components/responses/200_Response_Transfert"
+        400:
+          $ref: "#/components/responses/400_Response"
+        403:
+          $ref: "#/components/responses/403_Response"
+        500:
+          $ref: "#/components/responses/500_Response"
+
+components:
+  schemas:
+    CreateCurrency:
+      properties:
+        name:
+          type: string
+          example: Ariary
+        code:
+          type: string
+          example: MGA
+    
+    Currency:
+      type: object
+      allOf:
+        - properties:
+            id:
+              type: integer
+        - $ref: "#/components/schemas/CreateCurrency"
+
+    CreateAccount:
+      type: object
+      properties:
+        name:
+          type: string
+          example: current account
+        creationDate:
+          type: string
+          format: datetime
+        accountType:
+          $ref: "#/components/schemas/AccountType"
+        currencyId:
+          type: string
+
+    Account:
+      type: object
+      allOf:
+        - properties:
+            id: 
+              type: string
+        - $ref: "#/components/schemas/CreateAccount"
+        - properties:
+            balance:
+              $ref: "#/components/schemas/Balance"
+
+    Balance:
+      type: object
+      properties:
+        value:
+          type: number
+        lastUpdate:
+          type: string
+          format: datetime
+
+    AccountType:
+      enum:
+        - Cash
+        - Bank
+        - Mobile Money
+
+    CreateTransaction:
+      type: object
+      properties:
+        label:
+          type: string
+        amount:
+          type: number
+        accountId:
+          type: string
+        type:
+          $ref: "#/components/schemas/TransactionType"
+
+    Transaction:
+      type: object
+      allOf:
+        - properties:
+            id:
+              type: string
+        - $ref: "#/components/schemas/CreateTransaction"
+        - properties:
+            datetime:
+              type: string
+              format: datetime
+
+    TransactionType:
+      enum:
+        - DEBIT
+        - CREDIT
+
+    200_Response_Template:
+      type: object
+      properties:
+        status:
+          type: object
+          properties:
+            code:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: "Success Response"
+        body:
+          type: object
+
+    List_Currency:
+      allOf:
+        - $ref: "#/components/schemas/200_Response_Template"
+        - properties:
+            body:
+              type: array
+              items:
+                $ref: "#/components/schemas/Currency"
+            
+    List_Accounts:
+      allOf:
+        - $ref: "#/components/schemas/200_Response_Template"
+        - properties:
+            body:
+              type: array
+              items:
+                $ref: "#/components/schemas/Account"
+            
+    List_AccountType:
+      allOf:
+        - $ref: "#/components/schemas/200_Response_Template"
+        - properties:
+            body:
+              type: array
+              items:
+                $ref: "#/components/schemas/AccountType"
+
+    Response_Transaction:
+      allOf:
+        - $ref: "#/components/schemas/200_Response_Template"
+        - properties:
+            body:
+              type: object
+              $ref: "#/components/schemas/Transaction"
+    
+    Response_Transfert:
+      allOf:
+        - $ref: "#/components/schemas/200_Response_Template"
+        - properties:
+            body:
+              type: object
+              $ref: "#/components/schemas/TransferRequest"
+
+    TransferRequest:
+      properties:
+        accountSendId:
+          type: string
+        accountReceiveId:
+          type: string
+        amount:
+          type: number
+    
+  parameters:    
+    AccountId:
+      in: path
+      name: accountId
+      description: Id of account
+      schema:
+        type: string
+      required: true
+    
+    CurrencyId:
+      in: path
+      name: currencyId
+      description: Id of currency
+      schema:
+        type: integer
+      required: true
+    
+    AccountTypeId:
+      in: path
+      name: accountTypeId
+      description: Id of account type
+      schema:
+        type: integer
+      required: true
+
+
+  responses:
+    DefaultResponses:
+      description: Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+              body:
+                type: object
+        
+    200_Response_Currency:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/List_Currency"
+    
+    200_Response_Accounts:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/List_Accounts"
+    
+    200_Response_AccountType:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/List_AccountType"
+    
+    200_Response_Transaction:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Response_Transaction"
+    
+    200_Response_Transfert:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Response_Transfert"
+    
+    400_Response:
+      description: Bad request response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/responses/DefaultResponses"
+          example:
+            status:
+              code: 400
+              message: Bad Request
+            body: { }
+
+    403_Response:
+      description: Forbidden response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/responses/DefaultResponses"
+          example:
+            status:
+              code: 403
+              message: Forbidden
+            body: { }
+
+    500_Response:
+      description: Internal Server Error response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/responses/DefaultResponses"
+          example:
+            status:
+              code:  500
+              message: Internal Server Error
+            body: { }
