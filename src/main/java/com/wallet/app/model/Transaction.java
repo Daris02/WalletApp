@@ -17,11 +17,10 @@ public class Transaction {
     private Timestamp dateTime;
     private String accountId;
     
-    public Transaction(String label, Double amount, String type, Timestamp dateTime, String accountId) {
+    public Transaction(String label, Double amount, String type, String accountId) {
         this.label = label;
         this.amount = amount;
         this.type = type;
-        this.dateTime = dateTime;
         this.accountId = accountId;
     }
 }
