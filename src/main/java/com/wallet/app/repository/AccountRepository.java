@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 public class AccountRepository implements Crud<Account> {
-    private Connection connection = ConnectionDB.createConnection();
+    private final Connection connection = ConnectionDB.createConnection();
 
     @Override
     public Account getById(String id) {
@@ -81,7 +81,18 @@ public class AccountRepository implements Crud<Account> {
     public Account save(Account toSave) {
         toSave.setId(UUID.randomUUID().toString());
         
-        String sql = "";
+        String sql = "DO $$" +
+                "        BEGIN" +
+                "            BEGIN" +
+                "                INSERT INTO \"account\" (name, account_type) VALUES ('" + toSave.getName() + "', '" + toSave.getType() + "');" +
+                "                INSERT INTO \"balance_history\" (accountId) VALUES (" + toSave.getId() + " );" +
+                "            EXCEPTION" +
+                "                WHEN OTHERS THEN" +
+                "                    ROLLBACK;" +
+                "                    RAISE;" +
+                "            END;" +
+                "            COMMIT;" +
+                "        END $$;";
 
         try {
             connection.createStatement().executeUpdate(sql);
