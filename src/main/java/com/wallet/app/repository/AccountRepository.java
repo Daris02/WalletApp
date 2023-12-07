@@ -84,8 +84,8 @@ public class AccountRepository implements Crud<Account> {
         String sql = "DO $$" +
                 "        BEGIN" +
                 "            BEGIN" +
-                "                INSERT INTO \"account\" (name, account_type) VALUES ('" + toSave.getName() + "', '" + toSave.getType() + "');" +
-                "                INSERT INTO \"balance_history\" (accountId) VALUES (" + toSave.getId() + " );" +
+                "                INSERT INTO \"account\" (id, name, account_type) VALUES ( '" + toSave.getId() + "', '" + toSave.getName() + "', '" + toSave.getType() + "');" +
+                "                INSERT INTO \"balance_history\" (accountId) VALUES ('" + toSave.getId() + "' );" +
                 "            EXCEPTION" +
                 "                WHEN OTHERS THEN" +
                 "                    ROLLBACK;" +
