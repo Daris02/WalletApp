@@ -15,7 +15,7 @@ public class Account {
     private Double balance;
     private Timestamp creationDate;
     private String type;
-    private String currencyId;
+    private Integer currencyId;
         
     public Account(String name, String type) {
         this.name = name;

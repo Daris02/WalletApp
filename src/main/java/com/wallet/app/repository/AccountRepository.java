@@ -30,7 +30,8 @@ public class AccountRepository implements Crud<Account> {
                         resultSet.getString("name"),
                         resultSet.getDouble("balance"),
                         resultSet.getTimestamp("creationdate"),
-                        resultSet.getString("account_type")
+                        resultSet.getString("account_type"),
+                        resultSet.getInt("currencyid")
                     );
             }
             return responseSQL;
@@ -55,7 +56,8 @@ public class AccountRepository implements Crud<Account> {
                         resultSet.getString("name"),
                         resultSet.getDouble("balance"),
                         resultSet.getTimestamp("creationdate"),
-                        resultSet.getString("account_type")
+                        resultSet.getString("account_type"),
+                        resultSet.getInt("currencyid")
                     )
                 );
             }
@@ -84,7 +86,7 @@ public class AccountRepository implements Crud<Account> {
         String sql = "DO $$" +
                 "        BEGIN" +
                 "            BEGIN" +
-                "                INSERT INTO \"account\" (id, name, account_type) VALUES ( '" + toSave.getId() + "', '" + toSave.getName() + "', '" + toSave.getType() + "');" +
+                "                INSERT INTO \"account\" (id, name, account_type, currencyid) VALUES ( '" + toSave.getId() + "', '" + toSave.getName() + "', '" + toSave.getType() + "', 1);" +
                 "                INSERT INTO \"balance_history\" (accountId) VALUES ('" + toSave.getId() + "' );" +
                 "            EXCEPTION" +
                 "                WHEN OTHERS THEN" +
