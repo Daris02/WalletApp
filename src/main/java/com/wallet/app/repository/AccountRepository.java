@@ -30,13 +30,14 @@ public class AccountRepository implements Crud<Account> {
 
             while (resultSet.next()) {
                 Currency currency = new Currency();
-                if (resultSet.getString("account_type") == "1") {
+                if (resultSet.getInt("currencyid") == 1) {
                     currency.setName("Arairy");
                     currency.setCode("MGA");
-                } else if (resultSet.getString("account_type") == "2") {
+                } else if (resultSet.getInt("currencyid") == 2) {
                     currency.setName("Euro");
                     currency.setCode("EUR");
                 }
+
                 responseSQL = new Account(
                         resultSet.getString("id"),
                         resultSet.getString("name"),
@@ -62,16 +63,18 @@ public class AccountRepository implements Crud<Account> {
         try {
             ResultSet resultSet = connection.createStatement().executeQuery(sql);
 
-            Currency currency = new Currency();
-            if (resultSet.getString("account_type") == "1") {
-                currency.setName("Arairy");
-                currency.setCode("MGA");
-            } else if (resultSet.getString("account_type") == "2") {
-                currency.setName("Euro");
-                currency.setCode("EUR");
-            }
-
             while (resultSet.next()) {
+                Currency currency = new Currency();
+                if (resultSet.getInt("currencyid") == 1) {
+                    currency.setId("1");
+                    currency.setName("Arairy");
+                    currency.setCode("MGA");
+                } else if (resultSet.getInt("currencyid") == 2) {
+                    currency.setId("2");
+                    currency.setName("Euro");
+                    currency.setCode("EUR");
+                }
+
                 responseSQL.add(new Account(
                         resultSet.getString("id"),
                         resultSet.getString("name"),
