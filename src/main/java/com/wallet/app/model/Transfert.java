@@ -11,14 +11,14 @@ import lombok.*;
 @ToString
 public class Transfert {
     private String id;
-    private String accountId1;
-    private String accountId2;
+    private String debtorId;
+    private String creditorId;
     private Double amount;
     private Timestamp dateTime;
 
-    public Transfert(String accountId1, String accountId2, Double amount) {
-        this.accountId1 = accountId1;
-        this.accountId2 = accountId2;
+    public Transfert(String debtorId, String creditorId, Double amount) {
+        this.debtorId = debtorId;
+        this.creditorId = creditorId;
         this.amount = amount;
     }
 }
