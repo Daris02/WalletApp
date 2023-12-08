@@ -5,7 +5,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import com.wallet.app.config.ConnectionDB;
 import com.wallet.app.model.Transaction;
@@ -81,24 +80,42 @@ public class TransactionRepository implements Crud<Transaction> {
 
     @Override
     public Transaction save(Transaction toSave) {
-        toSave.setId(UUID.randomUUID().toString());
-        
-        String sql = "DO $$" +
-                "        BEGIN" +
-                "            BEGIN" +
-                "                UPDATE \"account\" SET balance = balance + " + toSave.getAmount() + " WHERE id = " + toSave.getAccountId() + ";" +
-                "                INSERT INTO \"balance_history\" (value, accountId) VALUES " +
-                "                    ( (SELECT balance FROM \"account\" WHERE id = " + toSave.getAccountId() + "), " + toSave.getAccountId() + " );" +
-                "                INSERT INTO \"transaction\" (label, amount, transactiontype, accountId) VALUES " +
-                "                    (" + toSave.getLabel() + ", " + toSave.getAmount() + ", " + toSave.getType() + ", " + toSave.getAccountId() + ");" +
-                "            EXCEPTION" +
-                "                WHEN OTHERS THEN" +
-                "                    ROLLBACK;" +
-                "                    RAISE;" +
-                "            END;" +
-                "            COMMIT;" +
-                "        END $$;";
+        String sql = "";
 
+        if ("DEBIT".equals(toSave.getType())) {
+            sql = "DO $$" +
+                    "BEGIN" +
+                    "   BEGIN" +
+                    "       UPDATE \"account\" SET balance = balance - " + toSave.getAmount() + " WHERE id = '" + toSave.getAccountId() + "' ;" +
+                    "       INSERT INTO \"balance_history\" (value, accountId) VALUES " +
+                    "           ( (SELECT balance FROM \"account\" WHERE id ='" + toSave.getAccountId() + "'), '" + toSave.getAccountId() + "' );" +
+                    "       INSERT INTO \"transaction\" (label, amount, transactiontype, accountId) VALUES " +
+                    "           ('" + toSave.getLabel() + "', " + toSave.getAmount() + ", '" + toSave.getType() + "', '" + toSave.getAccountId() + "');" +
+                    "       EXCEPTION" +
+                    "           WHEN OTHERS THEN" +
+                    "               ROLLBACK;" +
+                    "               RAISE;" +
+                    "   END;" +
+                    "   COMMIT;" +
+                    "END $$;";
+        } else if ("CREDIT".equals(toSave.getType())) {
+            sql = "DO $$" +
+                    "BEGIN" +
+                    "   BEGIN" +
+                    "       UPDATE \"account\" SET balance = balance + " + toSave.getAmount() + " WHERE id = '" + toSave.getAccountId() + "' ;" +
+                    "       INSERT INTO \"balance_history\" (value, accountId) VALUES " +
+                    "           ( (SELECT balance FROM \"account\" WHERE id = '" + toSave.getAccountId() + "'), '" + toSave.getAccountId() + "' );" +
+                    "       INSERT INTO \"transaction\" (label, amount, transactiontype, accountId) VALUES " +
+                    "           ('" + toSave.getLabel() + "', " + toSave.getAmount() + ", '" + toSave.getType() + "', '" + toSave.getAccountId() + "');" +
+                    "       EXCEPTION" +
+                    "           WHEN OTHERS THEN" +
+                    "               ROLLBACK;" +
+                    "               RAISE;" +
+                    "   END;" +
+                    "   COMMIT;" +
+                    "END $$;";
+        }
+        
         try {
             connection.createStatement().executeUpdate(sql);
             return toSave;
