@@ -15,4 +15,10 @@ public class Transfert {
     private String accountId2;
     private Double amount;
     private Timestamp dateTime;
+
+    public Transfert(String accountId1, String accountId2, Double amount) {
+        this.accountId1 = accountId1;
+        this.accountId2 = accountId2;
+        this.amount = amount;
+    }
 }
