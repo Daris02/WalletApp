@@ -17,15 +17,26 @@ public class Main {
         // System.out.println(curr.saveCurrency(new Currency("Dollar", "USD")));
         // System.out.println(curr.getAllCurrencies());
 
+
         AccountService acc = new AccountService();
-        // System.out.println(acc.saveAccount(new Account("saving account", "Bank")));
-        // System.out.println(acc.getAllAccounts());
+        Account account1 = new Account("test account", "Cash");
+        Account account2 = new Account("saving account", "Bank");
+
+        // System.out.println(acc.saveAccount(account1));
+        // System.out.println(acc.saveAccount(account2));
+
+        System.out.println(acc.getAllAccounts());
+
+        // System.out.println(acc.getBalancesHistory("281c7a26-ba83-494f-9330-542c2d786b1f"));
+
 
         TransactionService tran = new TransactionService();
-        Transaction transaction1 = new Transaction("Gift", 20_000.0, "DEBIT", "059b0f00-fcf8-4b2c-bde7-4ec2d695f7f1");
-        Transaction transaction2 = new Transaction("Salary", 100_000.25, "CREDIT", "f790706d-24b1-4c5e-8825-7c6a6e71c102");
-        System.out.println(tran.saveTransaction(transaction1));
+        Transaction transaction1 = new Transaction("Salary", 100_000.0, "CREDIT", "281c7a26-ba83-494f-9330-542c2d786b1f");
+        Transaction transaction2 = new Transaction("Gift", 2_000_000.0, "CREDIT", "78047217-9fb5-449c-9622-57fc960bdeeb");
+
+        // System.out.println(tran.saveTransaction(transaction1));
         // System.out.println(tran.saveTransaction(transaction2));
+
         // System.out.println(String.valueOf(transaction.getAmount()));
     }
 }
