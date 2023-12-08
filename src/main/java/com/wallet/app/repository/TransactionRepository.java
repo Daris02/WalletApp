@@ -15,9 +15,35 @@ import lombok.NoArgsConstructor;
 public class TransactionRepository implements Crud<Transaction> {
     private final Connection connection = ConnectionDB.createConnection();
 
+    public List<Transaction> findAllByAccountId(String id) {
+        String sql = "SELECT * FROM \"transaction\" WHERE accountid = '" + id + "';";
+        List<Transaction> responseSQL = new ArrayList<>();
+
+        try {
+            ResultSet resultSet = connection.createStatement().executeQuery(sql);
+
+            while (resultSet.next()) {
+                responseSQL.add(new Transaction(
+                        resultSet.getString("id"),
+                        resultSet.getString("label"),
+                        resultSet.getDouble("amount"),
+                        resultSet.getString("transactiontype"),
+                        resultSet.getTimestamp("datetime"),
+                        resultSet.getString("accountid")
+                    )
+                );
+            }
+            return responseSQL;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     @Override
     public Transaction getById(String id) {
-        String sql = "SELECT * FROM \"transaction\" WHERE id = " + id + ";";
+        String sql = "SELECT * FROM \"transaction\" WHERE id = '" + id + "';";
         Transaction responseSQL = null;
 
         try {
@@ -124,5 +150,5 @@ public class TransactionRepository implements Crud<Transaction> {
         }
         return null;
     }
-    
+
 }

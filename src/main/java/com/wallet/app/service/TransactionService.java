@@ -32,4 +32,8 @@ public class TransactionService {
         }
         return accounts;
     }
+
+    public List<Transaction> getALlTransactionsByAccoundId(String id) {
+        return transactionRepo.findAllByAccountId(id);
+    }
 }
