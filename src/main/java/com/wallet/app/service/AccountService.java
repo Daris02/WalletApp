@@ -3,6 +3,7 @@ package com.wallet.app.service;
 import java.util.List;
 
 import com.wallet.app.model.Account;
+import com.wallet.app.model.Balance;
 import com.wallet.app.repository.AccountRepository;
 
 public class AccountService {
@@ -22,5 +23,9 @@ public class AccountService {
 
     public List<Account> saveAllAccounts(List<Account> accounts) {
         return accountRepo.saveAll(accounts);
+    }
+
+    public List<Balance> getBalancesHistory(String id) {
+        return accountRepo.getBalanceHistory(id);
     }
 }

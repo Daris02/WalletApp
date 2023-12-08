@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import com.wallet.app.config.ConnectionDB;
 import com.wallet.app.model.Account;
+import com.wallet.app.model.Balance;
 
 import lombok.NoArgsConstructor;
 
@@ -105,4 +106,27 @@ public class AccountRepository implements Crud<Account> {
         return null;
     }
     
+    public List<Balance> getBalanceHistory(String id) {
+        String sql = "SELECT  * FROM \"balance_history\" WHERE accountid = '" + id + "';";
+        List<Balance> responseSQL = new ArrayList<>();
+
+        try {
+            ResultSet resultSet = connection.createStatement().executeQuery(sql);
+
+            while (resultSet.next()) {
+                responseSQL.add(new Balance(
+                        resultSet.getString("id"),
+                        resultSet.getDouble("value"),
+                        resultSet.getTimestamp("lastupdate"),
+                        resultSet.getString("accountid")
+                    )
+                );
+            }
+            return responseSQL;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
