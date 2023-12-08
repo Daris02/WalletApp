@@ -15,14 +15,8 @@ public class Account {
     private Double balance;
     private Timestamp creationDate;
     private String type;
-    
-    public Account(String name, Double balance, Timestamp creationDate, String type) {
-        this.name = name;
-        this.balance = balance;
-        this.creationDate = creationDate;
-        this.type = type;
-    }
-    
+    private String currencyId;
+        
     public Account(String name, String type) {
         this.name = name;
         this.type = type;
