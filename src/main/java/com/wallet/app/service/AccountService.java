@@ -8,13 +8,21 @@ import com.wallet.app.repository.AccountRepository;
 
 public class AccountService {
     private AccountRepository accountRepo = new AccountRepository();
-    
+
+    private TransactionService transactionService = new TransactionService();
+
     public Account getAccountById(String id) {
-        return accountRepo.getById(id);
+        Account account = accountRepo.getById(id);
+        account.setTransactionList(transactionService.getALlTransactionsByAccoundId(id));
+        return account;
     }
 
     public List<Account> getAllAccounts() {
-        return accountRepo.findAll();
+        List<Account> accounts = accountRepo.findAll();
+        for (Account account : accounts) {
+            account.setTransactionList(transactionService.getALlTransactionsByAccoundId(account.getId()));
+        }
+        return accounts;
     }
 
     public Account saveAccount(Account Account) {
