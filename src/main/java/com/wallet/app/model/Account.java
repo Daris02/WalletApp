@@ -16,7 +16,7 @@ public class Account {
     private Double balance;
     private Timestamp creationDate;
     private String type;
-    private Integer currencyId;
+    private Currency currency;
     private List<Transaction> transactionList;
         
     public Account(String name, String type) {
@@ -24,12 +24,12 @@ public class Account {
         this.type = type;
     }
 
-    public Account(String id, String name, Double balance, Timestamp creationDate, String type, Integer currencyId) {
+    public Account(String id, String name, Double balance, Timestamp creationDate, String type, Currency currency) {
         this.id = id;
         this.name = name;
         this.balance = balance;
         this.creationDate = creationDate;
         this.type = type;
-        this.currencyId = currencyId;
+        this.currency = currency;
     }
 }

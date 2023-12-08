@@ -12,6 +12,7 @@ import java.util.UUID;
 import com.wallet.app.config.ConnectionDB;
 import com.wallet.app.model.Account;
 import com.wallet.app.model.Balance;
+import com.wallet.app.model.Currency;
 
 import lombok.NoArgsConstructor;
 
@@ -28,13 +29,21 @@ public class AccountRepository implements Crud<Account> {
             ResultSet resultSet = connection.createStatement().executeQuery(sql);
 
             while (resultSet.next()) {
+                Currency currency = new Currency();
+                if (resultSet.getString("account_type") == "1") {
+                    currency.setName("Arairy");
+                    currency.setCode("MGA");
+                } else if (resultSet.getString("account_type") == "2") {
+                    currency.setName("Euro");
+                    currency.setCode("EUR");
+                }
                 responseSQL = new Account(
                         resultSet.getString("id"),
                         resultSet.getString("name"),
                         resultSet.getDouble("balance"),
                         resultSet.getTimestamp("creationdate"),
                         resultSet.getString("account_type"),
-                        resultSet.getInt("currencyid")
+                        currency
                     );
             }
             return responseSQL;
@@ -53,6 +62,15 @@ public class AccountRepository implements Crud<Account> {
         try {
             ResultSet resultSet = connection.createStatement().executeQuery(sql);
 
+            Currency currency = new Currency();
+            if (resultSet.getString("account_type") == "1") {
+                currency.setName("Arairy");
+                currency.setCode("MGA");
+            } else if (resultSet.getString("account_type") == "2") {
+                currency.setName("Euro");
+                currency.setCode("EUR");
+            }
+
             while (resultSet.next()) {
                 responseSQL.add(new Account(
                         resultSet.getString("id"),
@@ -60,7 +78,7 @@ public class AccountRepository implements Crud<Account> {
                         resultSet.getDouble("balance"),
                         resultSet.getTimestamp("creationdate"),
                         resultSet.getString("account_type"),
-                        resultSet.getInt("currencyid")
+                        currency
                     )
                 );
             }
