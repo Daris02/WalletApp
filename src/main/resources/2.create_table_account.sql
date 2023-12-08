@@ -6,5 +6,6 @@ CREATE TABLE IF NOT EXISTS "account" (
     name VARCHAR(200) NOT NULL,
     balance DECIMAL DEFAULT 0,
     creationdate TIMESTAMP DEFAULT current_timestamp,
-    account_type VARCHAR(25) CHECK (account_type IN ('Cash', 'Bank', 'Mobile Money'))
+    account_type VARCHAR(25) CHECK (account_type IN ('Cash', 'Bank', 'Mobile Money')),
+    currencyid UUID REFERENCES "currency"(id)
 );
