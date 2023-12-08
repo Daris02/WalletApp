@@ -11,6 +11,6 @@ import lombok.*;
 public class Balance {
     private String id;
     private Double value;
-    private Timestamp lastUpdate;
+    private Timestamp updateDateTime;
     private String accountId;
 }
