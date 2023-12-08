@@ -2,6 +2,9 @@ package com.wallet.app.service;
 
 import java.util.List;
 
+import java.time.LocalDateTime;
+import java.sql.Timestamp;
+
 import com.wallet.app.model.Account;
 import com.wallet.app.model.Balance;
 import com.wallet.app.repository.AccountRepository;
@@ -34,6 +37,12 @@ public class AccountService {
     }
 
     public List<Balance> getBalancesHistory(String id) {
-        return accountRepo.getBalanceHistory(id);
+        return accountRepo.getBalanceHistory(id, null, null);
+    }
+    
+    public List<Balance> getBalancesHistoryWithDate(String id, LocalDateTime startDatetime, LocalDateTime endDatetime) {
+        Timestamp start = Timestamp.valueOf(startDatetime);
+        Timestamp end = Timestamp.valueOf(endDatetime);
+        return accountRepo.getBalanceHistory(id, start, end);
     }
 }
