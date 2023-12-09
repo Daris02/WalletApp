@@ -19,6 +19,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AccountRepository implements Crud<Account> {
     private final Connection connection = ConnectionDB.createConnection();
+    private CurrencyRepository currencyRepo = new CurrencyRepository();
 
     @Override
     public Account getById(String id) {
@@ -29,22 +30,13 @@ public class AccountRepository implements Crud<Account> {
             ResultSet resultSet = connection.createStatement().executeQuery(sql);
 
             while (resultSet.next()) {
-                Currency currency = new Currency();
-                if (resultSet.getInt("currencyid") == 1) {
-                    currency.setName("Arairy");
-                    currency.setCode("MGA");
-                } else if (resultSet.getInt("currencyid") == 2) {
-                    currency.setName("Euro");
-                    currency.setCode("EUR");
-                }
-
                 responseSQL = new Account(
                         resultSet.getString("id"),
                         resultSet.getString("name"),
                         resultSet.getDouble("balance"),
                         resultSet.getTimestamp("creationdate"),
                         resultSet.getString("account_type"),
-                        currency
+                        currencyRepo.getById(resultSet.getString("currencyid"))
                     );
             }
             return responseSQL;
@@ -64,24 +56,13 @@ public class AccountRepository implements Crud<Account> {
             ResultSet resultSet = connection.createStatement().executeQuery(sql);
 
             while (resultSet.next()) {
-                Currency currency = new Currency();
-                if (resultSet.getInt("currencyid") == 1) {
-                    currency.setId("1");
-                    currency.setName("Arairy");
-                    currency.setCode("MGA");
-                } else if (resultSet.getInt("currencyid") == 2) {
-                    currency.setId("2");
-                    currency.setName("Euro");
-                    currency.setCode("EUR");
-                }
-
                 responseSQL.add(new Account(
                         resultSet.getString("id"),
                         resultSet.getString("name"),
                         resultSet.getDouble("balance"),
                         resultSet.getTimestamp("creationdate"),
                         resultSet.getString("account_type"),
-                        currency
+                        currencyRepo.getById(resultSet.getString("currencyid"))
                     )
                 );
             }
