@@ -12,7 +12,6 @@ import java.util.UUID;
 import com.wallet.app.config.ConnectionDB;
 import com.wallet.app.model.Account;
 import com.wallet.app.model.Balance;
-import com.wallet.app.model.Currency;
 
 import lombok.NoArgsConstructor;
 
