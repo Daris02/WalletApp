@@ -46,8 +46,12 @@ public class TransfertRepository implements Crud<Transfert> {
 
     @Override
     public List<Transfert> saveAll(List<Transfert> toSave) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'saveAll'");
+        List<Transfert> saveAll = new ArrayList<>();
+        for (Transfert transfert : toSave) {
+            save(transfert);
+            saveAll.add(getById(transfert.getId()));
+        }
+        return saveAll;
     }
 
     @Override
