@@ -14,13 +14,32 @@ public class TransfertRepository implements Crud<Transfert> {
 
     @Override
     public Transfert getById(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getById'");
+        String sql = "SELECT * FROM \"transfert\" WHERE id = '" + id + "';";
+        Transfert responseSQL = null;
+
+        try {
+            ResultSet resultSet = connection.createStatement().executeQuery(sql);
+
+            while (resultSet.next()) {
+                responseSQL = new Transfert(
+                        resultSet.getString("id"),
+                        resultSet.getString("accountId1"),
+                        resultSet.getString("accountId2"),
+                        resultSet.getDouble("amount"),
+                        resultSet.getTimestamp("datetime")
+                    );
+            }
+            return responseSQL;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override
     public List<Transfert> findAll() {
-        String sql = "SELECT  * FROM \"transfert\" ORDER BY datetime;";
+        String sql = "SELECT * FROM \"transfert\" ORDER BY datetime;";
         List<Transfert> responseSQL = new ArrayList<>();
 
         try {
