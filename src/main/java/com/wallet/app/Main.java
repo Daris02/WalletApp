@@ -29,7 +29,7 @@ public class Main {
         // System.out.println(acc.saveAccount(account1));
         // System.out.println(acc.saveAccount(account2));
 
-        // System.out.println(acc.getAllAccounts());
+        System.out.println(acc.getAllAccounts());
 
         // System.out.println(acc.getBalancesHistory("a28301bf-593e-435e-9e9a-bdf7d00cb64a"));
         // System.out.println(acc.getBalancesHistoryWithDate("a28301bf-593e-435e-9e9a-bdf7d00cb64a", LocalDateTime.of(2023, 12, 8, 17, 0, 0), LocalDateTime.of(2023, 12, 8, 18, 0, 0)));
@@ -43,7 +43,7 @@ public class Main {
         // System.out.println(tran.saveTransaction(transaction2));
 
         TransfertService traf = new TransfertService();
-        traf.saveTransfert("a28301bf-593e-435e-9e9a-bdf7d00cb64a", "a216cda3-8387-4a51-9369-414e43c5c1bc", 50_000.0);
-        System.out.println(traf.getAllTransferts());
+        // traf.saveTransfert("a28301bf-593e-435e-9e9a-bdf7d00cb64a", "a216cda3-8387-4a51-9369-414e43c5c1bc", 50_000.0);
+        // System.out.println(traf.getAllTransferts());
     }
 }
