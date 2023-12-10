@@ -7,10 +7,12 @@ import java.sql.Timestamp;
 
 import com.wallet.app.model.Account;
 import com.wallet.app.model.Balance;
+import com.wallet.app.model.Currency;
 import com.wallet.app.repository.AccountRepository;
 
 public class AccountService {
     private AccountRepository accountRepo = new AccountRepository();
+    private CurrencyService currencyService = new CurrencyService();
 
     private TransactionService transactionService = new TransactionService();
 
@@ -28,7 +30,13 @@ public class AccountService {
         return accounts;
     }
 
-    public Account saveAccount(Account Account) {
+    public Account saveAccount(Account Account, String currencyCode) {
+        for (Currency curr : currencyService.getAllCurrencies()) {
+            if(curr.getCode().equals(currencyCode)) {
+                Account.setCurrency(curr);
+                Account.setBalance(0.0);
+            }
+        }
         return accountRepo.save(Account);
     }
 
