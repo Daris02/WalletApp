@@ -86,11 +86,11 @@ public class AccountRepository implements Crud<Account> {
     @Override
     public Account save(Account toSave) {
         toSave.setId(UUID.randomUUID().toString());
-        
+
         String sql = "DO $$" +
                 "        BEGIN" +
                 "            BEGIN" +
-                "                INSERT INTO \"account\" (id, name, account_type, currencyid) VALUES ( '" + toSave.getId() + "', '" + toSave.getName() + "', '" + toSave.getType() + "', 1);" +
+                "                INSERT INTO \"account\" (id, name, account_type, currencyid) VALUES ( '" + toSave.getId() + "', '" + toSave.getName() + "', '" + toSave.getType() + "', " + toSave.getCurrency().getId() + ");" +
                 "                INSERT INTO \"balance_history\" (accountId) VALUES ('" + toSave.getId() + "' );" +
                 "            EXCEPTION" +
                 "                WHEN OTHERS THEN" +
