@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS "currency_value" (
     currency_source INT REFERENCES "currency"(id),
     currency_destination INT REFERENCES "currency"(id),
     amount DECIMAL NOT NULL,
-    date_effect DATE
+    date_effect DATE DEFAULT current_date
 );
 
 INSERT INTO "currency_value" (currency_source, currency_destination, amount, date_effect) VALUES
