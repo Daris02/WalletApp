@@ -30,4 +30,12 @@ public class CurrencyService {
     public List<CurrencyValue> getAllCurrencyValues() {
         return currencyValueRepo.findAll();
     }
+
+    public CurrencyValue getCurrencyValueById(String id) {
+        return currencyValueRepo.getById(id);
+    }
+
+    public CurrencyValue saveCurrencyValue(CurrencyValue toSave) {
+        return currencyValueRepo.save(toSave);
+    }
 }

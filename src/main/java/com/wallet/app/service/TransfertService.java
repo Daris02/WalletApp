@@ -2,6 +2,7 @@ package com.wallet.app.service;
 
 import java.util.List;
 
+import com.wallet.app.model.Currency;
 import com.wallet.app.model.Transaction;
 import com.wallet.app.model.Transfert;
 import com.wallet.app.repository.TransactionRepository;
@@ -17,11 +18,14 @@ public class TransfertService {
     }
     
     public Transfert saveTransfert(String debtorId, String creditorId, Double amount) {
+        Currency currencyDebitor = accountService.getAccountById(debtorId).getCurrency();
+        Currency currencyCreditor = accountService.getAccountById(creditorId).getCurrency();
+
         if (debtorId == creditorId) {
             System.out.println("Transfer failed: an account can't do transfer to himself.");
             return null;
         } else if (accountService.getAccountById(debtorId).getCurrency().getCode() != accountService.getAccountById(creditorId).getCurrency().getCode()) {
-            System.out.println("Transfer failed: an account can't do transfer to another account with different currency.");
+                        System.out.println("Transfer failed: an account can't do transfer to another account with different currency.");
             return null;
         }
 
@@ -35,3 +39,4 @@ public class TransfertService {
     }
     
 }
+ 
