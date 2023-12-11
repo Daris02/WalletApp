@@ -15,4 +15,10 @@ public class CurrencyValue {
     private String currencyDestination;
     private Double amount;
     private LocalDate dateEffect;
+
+    public CurrencyValue(String currencySource, String currencyDestination, Double amount) {
+        this.currencySource = currencySource;
+        this.currencyDestination = currencyDestination;
+        this.amount = amount;
+    }
 }
