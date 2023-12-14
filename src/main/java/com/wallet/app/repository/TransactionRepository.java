@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TransactionRepository implements Crud<Transaction> {
     private final Connection connection = ConnectionDB.createConnection();
+    AccountRepository accountRepo = new AccountRepository();
 
     public List<Transaction> findAllByAccountId(String id) {
         String sql = "SELECT * FROM \"transaction\" WHERE accountid = '" + id + "';";
@@ -112,9 +113,9 @@ public class TransactionRepository implements Crud<Transaction> {
             sql = "DO $$" +
                     "BEGIN" +
                     "   BEGIN" +
-                    "       UPDATE \"account\" SET balance = balance - " + toSave.getAmount() + " WHERE id = '" + toSave.getAccountId() + "' ;" +
                     "       INSERT INTO \"balance_history\" (value, accountId) VALUES " +
-                    "           ( (SELECT balance FROM \"account\" WHERE id ='" + toSave.getAccountId() + "'), '" + toSave.getAccountId() + "' );" +
+                    "           ( (" + accountRepo.getBalanceNow(toSave.getAccountId()).getValue() + " - " + toSave.getAmount() + "), " +
+                    "              '" + toSave.getAccountId() + "' );" +
                     "       INSERT INTO \"transaction\" (label, amount, transactiontype, accountId) VALUES " +
                     "           ('" + toSave.getLabel() + "', " + toSave.getAmount() + ", '" + toSave.getType() + "', '" + toSave.getAccountId() + "');" +
                     "       EXCEPTION" +
@@ -128,9 +129,9 @@ public class TransactionRepository implements Crud<Transaction> {
             sql = "DO $$" +
                     "BEGIN" +
                     "   BEGIN" +
-                    "       UPDATE \"account\" SET balance = balance + " + toSave.getAmount() + " WHERE id = '" + toSave.getAccountId() + "' ;" +
                     "       INSERT INTO \"balance_history\" (value, accountId) VALUES " +
-                    "           ( (SELECT balance FROM \"account\" WHERE id = '" + toSave.getAccountId() + "'), '" + toSave.getAccountId() + "' );" +
+                    "           ( (" + accountRepo.getBalanceNow(toSave.getAccountId()).getValue() + " + " + toSave.getAmount() + "), " +
+                    "            '" + toSave.getAccountId() + "' );" +
                     "       INSERT INTO \"transaction\" (label, amount, transactiontype, accountId) VALUES " +
                     "           ('" + toSave.getLabel() + "', " + toSave.getAmount() + ", '" + toSave.getType() + "', '" + toSave.getAccountId() + "');" +
                     "       EXCEPTION" +
@@ -145,7 +146,7 @@ public class TransactionRepository implements Crud<Transaction> {
         try {
             connection.createStatement().executeUpdate(sql);
             return toSave;
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
