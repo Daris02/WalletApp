@@ -7,5 +7,6 @@ CREATE TABLE IF NOT EXISTS "transaction" (
     amount DECIMAL DEFAULT 0,
     transactiontype VARCHAR(25) CHECK (transactiontype IN ('DEBIT', 'CREDIT')),
     datetime TIMESTAMP DEFAULT current_timestamp,
-    accountId uuid REFERENCES "account"(id) NOT NULL
+    accountId uuid REFERENCES "account"(id) NOT NULL,
+    categoryId INT REFERENCES "category"(id) NOT NULL
 );
