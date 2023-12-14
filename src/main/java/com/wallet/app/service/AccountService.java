@@ -8,6 +8,7 @@ import java.sql.Timestamp;
 import com.wallet.app.model.Account;
 import com.wallet.app.model.Balance;
 import com.wallet.app.model.Currency;
+import com.wallet.app.model.Transaction;
 import com.wallet.app.repository.AccountRepository;
 
 public class AccountService {
@@ -18,14 +19,21 @@ public class AccountService {
 
     public Account getAccountById(String id) {
         Account account = accountRepo.getById(id);
-        account.setTransactionList(transactionService.getALlTransactionsByAccoundId(id));
+        List<Transaction> transactionsList = transactionService.getALlTransactionsByAccoundId(id);
+        if (transactionsList != null) {
+            account.setTransactionList(transactionsList);
+        }
+
         return account;
     }
 
     public List<Account> getAllAccounts() {
         List<Account> accounts = accountRepo.findAll();
         for (Account account : accounts) {
-            account.setTransactionList(transactionService.getALlTransactionsByAccoundId(account.getId()));
+            List<Transaction> transactionsList = transactionService.getALlTransactionsByAccoundId(account.getId());
+            if (transactionsList != null) {
+                account.setTransactionList(transactionsList);
+            }
         }
         return accounts;
     }
