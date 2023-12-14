@@ -11,7 +11,13 @@ import com.wallet.app.service.CurrencyService;
 import com.wallet.app.service.TransactionService;
 import com.wallet.app.service.TransfertService;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 
 public class Main {
     public static void main(String[] args) {
@@ -54,7 +60,8 @@ public class Main {
             // System.out.println(tran.saveTransaction(T5));
 
         TransfertService traf = new TransfertService();
-            traf.saveTransfert("9092d140-e16f-45f9-9476-51166f2b7ff9", "3a04306b-bf00-40be-8149-19415e04d5a8", 5.0);
-            System.out.println(traf.getAllTransferts());
+            // traf.saveTransfert("9092d140-e16f-45f9-9476-51166f2b7ff9", "3a04306b-bf00-40be-8149-19415e04d5a8", 5.0, "median");
+            // System.out.println(traf.getAllTransferts());
+
     }
 }
