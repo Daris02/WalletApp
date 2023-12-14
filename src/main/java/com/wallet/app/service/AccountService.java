@@ -20,6 +20,7 @@ public class AccountService {
     public Account getAccountById(String id) {
         Account account = accountRepo.getById(id);
         List<Transaction> transactionsList = transactionService.getALlTransactionsByAccoundId(id);
+        account.setBalance(accountRepo.getBalanceNow(id).getValue());
         if (transactionsList != null) {
             account.setTransactionList(transactionsList);
         }
@@ -31,6 +32,7 @@ public class AccountService {
         List<Account> accounts = accountRepo.findAll();
         for (Account account : accounts) {
             List<Transaction> transactionsList = transactionService.getALlTransactionsByAccoundId(account.getId());
+            account.setBalance(accountRepo.getBalanceNow(account.getId()).getValue());
             if (transactionsList != null) {
                 account.setTransactionList(transactionsList);
             }
@@ -42,7 +44,6 @@ public class AccountService {
         for (Currency curr : currencyService.getAllCurrencies()) {
             if(curr.getCode().equals(currencyCode)) {
                 Account.setCurrency(curr);
-                Account.setBalance(0.0);
             }
         }
         return accountRepo.save(Account);

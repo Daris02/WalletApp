@@ -32,7 +32,7 @@ public class AccountRepository implements Crud<Account> {
                 responseSQL = new Account(
                         resultSet.getString("id"),
                         resultSet.getString("name"),
-                        resultSet.getDouble("balance"),
+                        0.0,
                         resultSet.getTimestamp("creationdate"),
                         resultSet.getString("account_type"),
                         currencyRepo.getById(resultSet.getString("currencyid"))
@@ -58,7 +58,7 @@ public class AccountRepository implements Crud<Account> {
                 responseSQL.add(new Account(
                         resultSet.getString("id"),
                         resultSet.getString("name"),
-                        resultSet.getDouble("balance"),
+                        0.0,
                         resultSet.getTimestamp("creationdate"),
                         resultSet.getString("account_type"),
                         currencyRepo.getById(resultSet.getString("currencyid"))
@@ -140,6 +140,32 @@ public class AccountRepository implements Crud<Account> {
                 ));
             }
 
+            return responseSQL;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Balance getBalanceNow(String id) {
+        String sql = "SELECT bh.* FROM \"account\" a INNER JOIN \"balance_history\" bh ON bh.accountid = a.id " +
+                     "WHERE a.id = '" + id + "' " +
+                     "ORDER BY updatedatetime DESC " +
+                     "LIMIT 1;";
+        Balance responseSQL = null;
+
+        try {
+            ResultSet resultSet = connection.createStatement().executeQuery(sql);
+
+            while (resultSet.next()) {
+                responseSQL = new Balance(
+                        resultSet.getString("id"),
+                        resultSet.getDouble("value"),
+                        resultSet.getTimestamp("updatedatetime"),
+                        resultSet.getString("accountid")
+                    );
+            }
             return responseSQL;
 
         } catch (SQLException e) {
