@@ -1,8 +1,9 @@
 package com.wallet.app.service;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import java.time.LocalDateTime;
 import java.time.LocalDate;
 
 import com.wallet.app.model.Currency;
@@ -22,7 +23,7 @@ public class TransfertService {
         return transfertRepository.findAll();
     }
     
-    public Transfert saveTransfert(String debtorId, String creditorId, Double amount) {
+    public Transfert saveTransfert(String debtorId, String creditorId, Double amount, String currencyValueChoice) {
         String currencyDebitorId = accountService.getAccountById(debtorId).getCurrency().getId();
         String currencyCreditorId = accountService.getAccountById(creditorId).getCurrency().getId();
         Double finalAmount = 0.0;
@@ -35,14 +36,42 @@ public class TransfertService {
             Currency currencyCreditor = null;
             Double rateChange = 0.0;
 
+            List<Double> listAmountValues = new ArrayList<>();
+
             for (CurrencyValue currencyValue : currencyService.getAllCurrencyValues()) {
-                if (currencyValue.getDateEffect().equals(LocalDate.now())) {
+                if (currencyValue.getDateEffect().toLocalDate().equals(LocalDate.now())) {
+                    listAmountValues.add(currencyValue.getAmount());
                     currencyDebitor = currencyService.getCurrencyById(currencyValue.getCurrencySource());
                     currencyCreditor = currencyService.getCurrencyById(currencyValue.getCurrencyDestination());
-                    rateChange = currencyValue.getAmount();
                 }
             }
+            
+            Collections.sort(listAmountValues);
+            int middle = listAmountValues.size() / 2;
+            Double max = listAmountValues.get(listAmountValues.size() - 1);
+            Double min = listAmountValues.get(0);
+            Double median = null;
+            
+            if (listAmountValues.size() == 1) {
+                rateChange = listAmountValues.get(0);
+            }
+            if (listAmountValues.size() % 2 != 0) {
+                median = listAmountValues.get(middle);
+            }
+            if (listAmountValues.size() % 2 == 0) {
+                median = (listAmountValues.get(middle) + listAmountValues.get(middle - 1)) / 2;
+            }
 
+            if (currencyValueChoice.equals("max")) {
+                rateChange = max;
+            }
+            if (currencyValueChoice.equals("min")) {
+                rateChange = min;
+            }
+            if (currencyValueChoice.equals("median")) {
+                rateChange = median;
+            }
+            
             if (currencyDebitor.getCode().equals("EUR") && currencyCreditor.getCode().equals("MGA")) {
                 finalAmount = amount * rateChange;
             }
