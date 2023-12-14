@@ -1,6 +1,6 @@
 package com.wallet.app.model;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import lombok.*;
 
@@ -14,7 +14,7 @@ public class CurrencyValue {
     private String currencySource;
     private String currencyDestination;
     private Double amount;
-    private LocalDate dateEffect;
+    private LocalDateTime dateEffect;
 
     public CurrencyValue(String currencySource, String currencyDestination, Double amount) {
         this.currencySource = currencySource;

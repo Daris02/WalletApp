@@ -6,9 +6,9 @@ CREATE TABLE IF NOT EXISTS "currency_value" (
     currency_source INT REFERENCES "currency"(id),
     currency_destination INT REFERENCES "currency"(id),
     amount DECIMAL NOT NULL,
-    date_effect DATE DEFAULT current_date
+    date_effect TIMESTAMP DEFAULT current_timestamp
 );
 
-INSERT INTO "currency_value" (currency_source, currency_destination, amount, date_effect) VALUES
-(2, 1, 4_500, '2023-12-10'),
-(2, 1, 4_600, '2023-12-11');
+INSERT INTO "currency_value" (currency_source, currency_destination, amount) VALUES
+(2, 1, 4_500),
+(2, 1, 4_600);

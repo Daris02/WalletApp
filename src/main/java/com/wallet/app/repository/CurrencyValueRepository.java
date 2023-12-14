@@ -26,7 +26,7 @@ public class CurrencyValueRepository implements Crud<CurrencyValue> {
                         resultSet.getString("currency_source"),
                         resultSet.getString("currency_destination"),
                         resultSet.getDouble("amount"),
-                        resultSet.getDate("date_effect").toLocalDate()
+                        resultSet.getTimestamp("date_effect").toLocalDateTime()
                     );
             }
             return responseSQL;
@@ -51,7 +51,7 @@ public class CurrencyValueRepository implements Crud<CurrencyValue> {
                         resultSet.getString("currency_source"),
                         resultSet.getString("currency_destination"),
                         resultSet.getDouble("amount"),
-                        resultSet.getDate("date_effect").toLocalDate()
+                        resultSet.getTimestamp("date_effect").toLocalDateTime()
                     )
                 );
             }
