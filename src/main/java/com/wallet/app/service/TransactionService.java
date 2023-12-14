@@ -22,12 +22,12 @@ public class TransactionService {
         AccountService accountService = new AccountService();
         Account account = accountService.getAccountById(transaction.getAccountId());
         Double balance = account.getBalance();
-        if (!account.getType().equals("Bank") && balance < transaction.getAmount()) {
+        if (!account.getType().equals("Bank") && balance < transaction.getAmount() && transaction.getType().equals("DEBIT")) {
             System.out.println("Transaction failed: balance not enough.");
             return null;
         }        
         transactionRepo.save(transaction);
-        return account;
+        return accountService.getAccountById(transaction.getAccountId());
     }
 
     public List<Account> saveAllTransactions(List<Transaction> transactions) {
