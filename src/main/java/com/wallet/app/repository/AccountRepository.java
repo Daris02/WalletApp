@@ -22,7 +22,7 @@ public class AccountRepository implements Crud<Account> {
 
     @Override
     public Account getById(String id) {
-        String sql = "SELECT * FROM \"account\" WHERE id = " + id + ";";
+        String sql = "SELECT * FROM \"account\" WHERE id = '" + id + "';";
         Account responseSQL = null;
 
         try {
