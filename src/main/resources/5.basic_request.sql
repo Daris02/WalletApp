@@ -91,16 +91,14 @@
 
 
 -- Sum of cash inflows and outflows between the given date range
-    SELECT (
-            SUM(CASE WHEN tr.transactiontype = 'DEBIT' THEN 'DEBIT' ELSE 0 END) -
-            SUM(CASE WHEN tr.transactiontype = 'CREDIT' THEN 'CREDIT' ELSE 0 END)
-        ) AS total_amount
+    SELECT
+        COALESCE(SUM(CASE WHEN tr.transactiontype = 'DEBIT' THEN value ELSE 0 END), 0) AS total_amount_spend,
+        COALESCE(SUM(CASE WHEN tr.transactiontype = 'CREDIT' THEN value ELSE 0 END), 0) AS total_amount_income
     FROM "balance_history" bh
         INNER JOIN "account" acc ON acc.id = bh.accountid
         INNER JOIN "transaction" tr ON tr.accountid = acc.id
     WHERE bh.accountId = 'ACCOUNT_ID'
     AND updateDateTime BETWEEN 'START_DATE' AND 'END_DATE';
-
 
 -- Sum of cash inflows and outflows between the given date range with transaction category
     SELECT c.id AS category_id,

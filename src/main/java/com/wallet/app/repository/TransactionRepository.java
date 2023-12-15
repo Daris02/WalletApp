@@ -137,7 +137,7 @@ public class TransactionRepository implements Crud<Transaction> {
                     "       INSERT INTO \"balance_history\" (value, accountId) VALUES " +
                     "           ( (" + accountRepo.getBalanceNow(toSave.getAccountId()).getValue() + " + " + toSave.getAmount() + "), " +
                     "            '" + toSave.getAccountId() + "' );" +
-                    "       INSERT INTO \"transaction\" (label, amount, transactiontype, accountId) VALUES " +
+                    "       INSERT INTO \"transaction\" (label, amount, transactiontype, accountId, categoryId) VALUES " +
                     "           ('" + toSave.getLabel() + "', " + toSave.getAmount() + ", '" + toSave.getType() + "', '" + toSave.getAccountId() + "', " + toSave.getCategoryId() + ");" +
                     "       EXCEPTION" +
                     "           WHEN OTHERS THEN" +

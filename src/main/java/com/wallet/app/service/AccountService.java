@@ -4,18 +4,22 @@ import java.util.List;
 
 import java.time.LocalDateTime;
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.wallet.app.model.Account;
 import com.wallet.app.model.Balance;
+import com.wallet.app.model.Category;
 import com.wallet.app.model.Currency;
 import com.wallet.app.model.Transaction;
 import com.wallet.app.repository.AccountRepository;
+import com.wallet.app.repository.CategoryRepository;
 
 public class AccountService {
     private AccountRepository accountRepo = new AccountRepository();
     private CurrencyService currencyService = new CurrencyService();
     private TransactionService transactionService = new TransactionService();
+    private CategoryRepository categoryRepo = new CategoryRepository();
 
     public Account getAccountById(String id) {
         Account account = accountRepo.getById(id);
@@ -65,5 +69,28 @@ public class AccountService {
 
     public Map<String, Double> getAllTotalSpendAmounts(String accountId, LocalDateTime start, LocalDateTime end) {
         return accountRepo.findAllTotalSpendAmount(accountId, start.toString().replace("T", " "), end.toString().replace("T", " "));
+    }
+
+    public Map<String, Double> findAllTotalSpendAmounts(String accountId, LocalDateTime start, LocalDateTime end) {
+        Map<String, Double> allSpendAmounts = new HashMap<>();
+        List<Transaction> allTransactions = transactionService.getAllTransactionsByAccoundId(accountId);
+        List<Category> allCategories = categoryRepo.findAll();
+
+        for (Transaction transaction : allTransactions) {
+            if (transaction.getDateTime().after(Timestamp.valueOf(start)) && transaction.getDateTime().before(Timestamp.valueOf(end))) {
+                for (Category category : allCategories) {
+                    Double amount = 0.0;
+                    if (transaction.getCategoryId().equals(category.getId()) && !allSpendAmounts.containsKey(category.getName())) {
+                        allSpendAmounts.put(category.getName(),  transaction.getAmount() + amount);
+                    } else if (transaction.getCategoryId().equals(category.getId()) && allSpendAmounts.containsKey(category.getName())) {
+                        amount = allSpendAmounts.get(category.getName()) + transaction.getAmount();
+                        allSpendAmounts.put(category.getName(), transaction.getAmount() + amount);
+                    }
+                }
+            }
+        }
+        
+        // return null;
+        return allSpendAmounts;
     }
 }
