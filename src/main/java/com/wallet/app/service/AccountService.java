@@ -8,6 +8,7 @@ import java.sql.Timestamp;
 import com.wallet.app.model.Account;
 import com.wallet.app.model.Balance;
 import com.wallet.app.model.Currency;
+import com.wallet.app.model.SpendAmount;
 import com.wallet.app.model.Transaction;
 import com.wallet.app.repository.AccountRepository;
 
@@ -61,5 +62,9 @@ public class AccountService {
         Timestamp start = Timestamp.valueOf(startDatetime);
         Timestamp end = Timestamp.valueOf(endDatetime);
         return accountRepo.getBalanceHistory(id, start, end);
+    }
+
+    public List<SpendAmount> getAllTotalSpendAmounts(String accountId, LocalDateTime start, LocalDateTime end) {
+        return accountRepo.findAllTotalSpendAmount(accountId, start.toString().replace("T", " "), end.toString().replace("T", " "));
     }
 }

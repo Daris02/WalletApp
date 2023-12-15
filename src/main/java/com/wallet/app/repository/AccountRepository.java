@@ -12,6 +12,7 @@ import java.util.UUID;
 import com.wallet.app.config.ConnectionDB;
 import com.wallet.app.model.Account;
 import com.wallet.app.model.Balance;
+import com.wallet.app.model.SpendAmount;
 
 import lombok.NoArgsConstructor;
 
@@ -164,6 +165,37 @@ public class AccountRepository implements Crud<Account> {
                         resultSet.getDouble("value"),
                         resultSet.getTimestamp("updatedatetime"),
                         resultSet.getString("accountid")
+                    );
+            }
+            return responseSQL;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public List<SpendAmount> findAllTotalSpendAmount(String accountId, String startDatetime, String endDatetime) {
+        String sql = "  SELECT c.id AS category_id, " +
+                    "      c.name AS category_name, " +
+                    "      (SUM(CASE WHEN bh.value IS NOT NULL THEN bh.value ELSE 0 END)) AS total_amount " +
+                    "  FROM \"category\" c " +
+                    "      LEFT JOIN \"transaction\" tr ON tr.categoryid = c.id " +
+                    "      LEFT JOIN \"account\" acc ON acc.id = tr.accountid " +
+                    "       LEFT JOIN \"balance_history\" bh ON bh.accountid = acc.id " +
+                    "   WHERE bh.accountId = '" + accountId + "' " +
+                    "   AND updateDateTime BETWEEN '" + startDatetime + "' AND '" + endDatetime + "' " +
+                    "   GROUP BY c.id, c.name; ";
+        List<SpendAmount> responseSQL = new ArrayList<>();
+
+        try {
+            ResultSet resultSet = connection.createStatement().executeQuery(sql);
+            
+            while (resultSet.next()) {
+                responseSQL.add(new SpendAmount(
+                            resultSet.getString("category_name"),
+                            resultSet.getDouble("total_amount")
+                        )
                     );
             }
             return responseSQL;
