@@ -88,3 +88,28 @@
     FROM "account" a
         INNER JOIN "balance_history" bh ON bh.accountid = a.id
     WHERE a.id = 'ACCOUNT_ID'; 
+
+
+-- Sum of cash inflows and outflows between the given date range
+    SELECT (
+            SUM(CASE WHEN tr.transactiontype = 'DEBIT' THEN 'DEBIT' ELSE 0 END) -
+            SUM(CASE WHEN tr.transactiontype = 'CREDIT' THEN 'CREDIT' ELSE 0 END)
+        ) AS total_amount
+    FROM "balance_history" bh
+        INNER JOIN "account" acc ON acc.id = bh.accountid
+        INNER JOIN "transaction" tr ON tr.accountid = acc.id
+    WHERE bh.accountId = 'ACCOUNT_ID'
+    AND updateDateTime BETWEEN 'START_DATE' AND 'END_DATE';
+
+
+-- Sum of cash inflows and outflows between the given date range with transaction category
+    SELECT c.id AS category_id,
+       c.name AS category_name,
+       (SUM(CASE WHEN bh.value IS NOT NULL THEN bh.value ELSE 0 END)) AS total_amount
+    FROM "category" c
+    LEFT JOIN "transaction" tr ON tr.categoryid = c.id
+    LEFT JOIN "account" acc ON acc.id = tr.accountid
+    LEFT JOIN "balance_history" bh ON bh.accountid = acc.id
+        AND bh.accountId = 'ACCOUNT_ID'
+        AND bh.updateDateTime BETWEEN  'START_DATE' AND 'END_DATE'
+    GROUP BY c.id, c.name;
