@@ -71,7 +71,8 @@ public class TransfertService {
             if (currencyValueChoice.equals("median")) {
                 rateChange = median;
             }
-            
+
+            assert currencyDebitor != null;
             if (currencyDebitor.getCode().equals("EUR") && currencyCreditor.getCode().equals("MGA")) {
                 finalAmount = amount * rateChange;
             }
@@ -80,8 +81,8 @@ public class TransfertService {
             }
         }
 
-        transactionRepository.save(new Transaction("Transfert", amount, "DEBIT", debtorId));
-        transactionRepository.save(new Transaction("Transfert", finalAmount, "CREDIT", creditorId));
+        transactionRepository.save(new Transaction("Transfert", amount, "DEBIT", debtorId, 0));
+        transactionRepository.save(new Transaction("Transfert", finalAmount, "CREDIT", creditorId, 0));
         
         Transfert transfert = new Transfert(debtorId, creditorId, amount);
         transfertRepository.save(transfert);

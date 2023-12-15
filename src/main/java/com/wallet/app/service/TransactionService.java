@@ -4,11 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.wallet.app.model.Account;
+import com.wallet.app.model.Category;
 import com.wallet.app.model.Transaction;
+import com.wallet.app.repository.CategoryRepository;
 import com.wallet.app.repository.TransactionRepository;
 
 public class TransactionService {
     private TransactionRepository transactionRepo = new TransactionRepository();
+
+    private CategoryRepository categoryRepo = new CategoryRepository();
 
     public Transaction getTransactionById(String id) {
         return transactionRepo.getById(id);
@@ -22,10 +26,15 @@ public class TransactionService {
         AccountService accountService = new AccountService();
         Account account = accountService.getAccountById(transaction.getAccountId());
         Double balance = account.getBalance();
+
         if (!account.getType().equals("Bank") && balance < transaction.getAmount() && transaction.getType().equals("DEBIT")) {
             System.out.println("Transaction failed: balance not enough.");
             return null;
-        }        
+        }
+        
+        List<Category> listCategory = categoryRepo.findAll();
+        transaction.setCategoryId(listCategory.get(transaction.getCategoryId()).getId());
+
         transactionRepo.save(transaction);
         return accountService.getAccountById(transaction.getAccountId());
     }

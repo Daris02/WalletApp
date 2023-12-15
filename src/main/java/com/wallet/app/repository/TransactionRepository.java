@@ -30,7 +30,8 @@ public class TransactionRepository implements Crud<Transaction> {
                         resultSet.getDouble("amount"),
                         resultSet.getString("transactiontype"),
                         resultSet.getTimestamp("datetime"),
-                        resultSet.getString("accountid")
+                        resultSet.getString("accountid"),
+                        resultSet.getInt("categoryid")
                     )
                 );
             }
@@ -57,7 +58,8 @@ public class TransactionRepository implements Crud<Transaction> {
                         resultSet.getDouble("amount"),
                         resultSet.getString("transactiontype"),
                         resultSet.getTimestamp("datetime"),
-                        resultSet.getString("accountid")
+                        resultSet.getString("accountid"),
+                        resultSet.getInt("categoryid")
                     );
             }
             return responseSQL;
@@ -83,7 +85,8 @@ public class TransactionRepository implements Crud<Transaction> {
                         resultSet.getDouble("amount"),
                         resultSet.getString("transactiontype"),
                         resultSet.getTimestamp("datetime"),
-                        resultSet.getString("accountid")
+                        resultSet.getString("accountid"),
+                        resultSet.getInt("categoryid")
                     )
                 );
             }
@@ -116,8 +119,8 @@ public class TransactionRepository implements Crud<Transaction> {
                     "       INSERT INTO \"balance_history\" (value, accountId) VALUES " +
                     "           ( (" + accountRepo.getBalanceNow(toSave.getAccountId()).getValue() + " - " + toSave.getAmount() + "), " +
                     "              '" + toSave.getAccountId() + "' );" +
-                    "       INSERT INTO \"transaction\" (label, amount, transactiontype, accountId) VALUES " +
-                    "           ('" + toSave.getLabel() + "', " + toSave.getAmount() + ", '" + toSave.getType() + "', '" + toSave.getAccountId() + "');" +
+                    "       INSERT INTO \"transaction\" (label, amount, transactiontype, accountId,  categoryId) VALUES " +
+                    "           ('" + toSave.getLabel() + "', " + toSave.getAmount() + ", '" + toSave.getType() + "', '" + toSave.getAccountId() + "', " + toSave.getCategoryId() + ");" +
                     "       EXCEPTION" +
                     "           WHEN OTHERS THEN" +
                     "               ROLLBACK;" +
@@ -125,7 +128,9 @@ public class TransactionRepository implements Crud<Transaction> {
                     "   END;" +
                     "   COMMIT;" +
                     "END $$;";
-        } else if ("CREDIT".equals(toSave.getType())) {
+        }
+        
+        if ("CREDIT".equals(toSave.getType())) {
             sql = "DO $$" +
                     "BEGIN" +
                     "   BEGIN" +
@@ -133,7 +138,7 @@ public class TransactionRepository implements Crud<Transaction> {
                     "           ( (" + accountRepo.getBalanceNow(toSave.getAccountId()).getValue() + " + " + toSave.getAmount() + "), " +
                     "            '" + toSave.getAccountId() + "' );" +
                     "       INSERT INTO \"transaction\" (label, amount, transactiontype, accountId) VALUES " +
-                    "           ('" + toSave.getLabel() + "', " + toSave.getAmount() + ", '" + toSave.getType() + "', '" + toSave.getAccountId() + "');" +
+                    "           ('" + toSave.getLabel() + "', " + toSave.getAmount() + ", '" + toSave.getType() + "', '" + toSave.getAccountId() + "', " + toSave.getCategoryId() + ");" +
                     "       EXCEPTION" +
                     "           WHEN OTHERS THEN" +
                     "               ROLLBACK;" +
