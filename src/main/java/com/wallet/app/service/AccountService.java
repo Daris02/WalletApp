@@ -4,6 +4,7 @@ import java.util.List;
 
 import java.time.LocalDateTime;
 import java.sql.Timestamp;
+import java.util.Map;
 
 import com.wallet.app.model.Account;
 import com.wallet.app.model.Balance;
@@ -14,12 +15,11 @@ import com.wallet.app.repository.AccountRepository;
 public class AccountService {
     private AccountRepository accountRepo = new AccountRepository();
     private CurrencyService currencyService = new CurrencyService();
-
     private TransactionService transactionService = new TransactionService();
 
     public Account getAccountById(String id) {
         Account account = accountRepo.getById(id);
-        List<Transaction> transactionsList = transactionService.getALlTransactionsByAccoundId(id);
+        List<Transaction> transactionsList = transactionService.getAllTransactionsByAccoundId(id);
         account.setBalance(accountRepo.getBalanceNow(id).getValue());
         if (transactionsList != null) {
             account.setTransactionList(transactionsList);
@@ -31,7 +31,7 @@ public class AccountService {
     public List<Account> getAllAccounts() {
         List<Account> accounts = accountRepo.findAll();
         for (Account account : accounts) {
-            List<Transaction> transactionsList = transactionService.getALlTransactionsByAccoundId(account.getId());
+            List<Transaction> transactionsList = transactionService.getAllTransactionsByAccoundId(account.getId());
             account.setBalance(accountRepo.getBalanceNow(account.getId()).getValue());
             if (transactionsList != null) {
                 account.setTransactionList(transactionsList);
@@ -61,5 +61,9 @@ public class AccountService {
         Timestamp start = Timestamp.valueOf(startDatetime);
         Timestamp end = Timestamp.valueOf(endDatetime);
         return accountRepo.getBalanceHistory(id, start, end);
+    }
+
+    public Map<String, Double> getAllTotalSpendAmounts(String accountId, LocalDateTime start, LocalDateTime end) {
+        return accountRepo.findAllTotalSpendAmount(accountId, start.toString().replace("T", " "), end.toString().replace("T", " "));
     }
 }

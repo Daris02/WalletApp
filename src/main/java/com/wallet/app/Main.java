@@ -5,19 +5,11 @@ import com.wallet.app.model.Currency;
 import com.wallet.app.model.CurrencyValue;
 import com.wallet.app.model.Transaction;
 import com.wallet.app.model.Transfert;
-import com.wallet.app.repository.CurrencyValueRepository;
 import com.wallet.app.service.AccountService;
 import com.wallet.app.service.CurrencyService;
-import com.wallet.app.service.TransactionService;
 import com.wallet.app.service.TransfertService;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 
 public class Main {
     public static void main(String[] args) {
@@ -59,9 +51,16 @@ public class Main {
             // System.out.println(tran.saveTransaction(T4));
             System.out.println(tran.saveTransaction(T5));
 
+            // System.out.println(tran.getTransactionById("f00ff521-eae3-4a99-839c-3437fb7d1522"));
+
         TransfertService traf = new TransfertService();
             // traf.saveTransfert("9092d140-e16f-45f9-9476-51166f2b7ff9", "3a04306b-bf00-40be-8149-19415e04d5a8", 5.0, "median");
             // System.out.println(traf.getAllTransferts());
+
+        // Spend Amount ---
+        LocalDateTime start =  LocalDateTime.of(2023, 12, 12, 12, 30, 0);
+        LocalDateTime end = LocalDateTime.of(2023, 12, 15, 12, 30, 0);
+            System.out.println(acc.getAllTotalSpendAmounts("3a04306b-bf00-40be-8149-19415e04d5a8", start, end));
 
     }
 }

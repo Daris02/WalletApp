@@ -8,6 +8,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.wallet.app.config.ConnectionDB;
 import com.wallet.app.model.Account;
@@ -165,6 +167,33 @@ public class AccountRepository implements Crud<Account> {
                         resultSet.getTimestamp("updatedatetime"),
                         resultSet.getString("accountid")
                     );
+            }
+            return responseSQL;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Map<String, Double> findAllTotalSpendAmount(String accountId, String startDatetime, String endDatetime) {
+        String sql = "  SELECT c.id AS category_id, " +
+                    "      c.name AS category_name, " +
+                    "      (SUM(CASE WHEN bh.value IS NOT NULL THEN bh.value ELSE 0 END)) AS total_amount " +
+                    "  FROM \"category\" c " +
+                    "      LEFT JOIN \"transaction\" tr ON tr.categoryid = c.id " +
+                    "      LEFT JOIN \"account\" acc ON acc.id = tr.accountid " +
+                    "       LEFT JOIN \"balance_history\" bh ON bh.accountid = acc.id " +
+                    "   WHERE bh.accountId = '" + accountId + "' " +
+                    "   AND updateDateTime BETWEEN '" + startDatetime + "' AND '" + endDatetime + "' " +
+                    "   GROUP BY c.id, c.name; ";
+        Map<String, Double> responseSQL = new HashMap<>();
+
+        try {
+            ResultSet resultSet = connection.createStatement().executeQuery(sql);
+            
+            while (resultSet.next()) {
+                responseSQL.put(resultSet.getString("category_name"), resultSet.getDouble("total_amount"));
             }
             return responseSQL;
 
