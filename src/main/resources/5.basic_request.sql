@@ -88,3 +88,28 @@
     FROM "account" a
         INNER JOIN "balance_history" bh ON bh.accountid = a.id
     WHERE a.id = 'ACCOUNT_ID'; 
+
+
+-- Sum of cash inflows and outflows between the given date range
+    SELECT COALESCE(
+            SUM(CASE WHEN tr.transactiontype = 'DEBIT' THEN value ELSE 0 END) -
+            SUM(CASE WHEN tr.transactiontype = 'CREDIT' THEN value ELSE 0 END), 0
+        ) AS total_amount
+    FROM "balance_history" bh
+        INNER JOIN "account" acc ON acc.id = bh.accountid
+        INNER JOIN "transaction" tr ON tr.accountid = acc.id
+    WHERE bh.accountId = '3a04306b-bf00-40be-8149-19415e04d5a8'
+    AND updateDateTime BETWEEN '2023-12-12' AND '2023-12-15';
+
+
+-- Sum of cash inflows and outflows between the given date range with transaction category
+    SELECT c.id AS category_id,
+       c.name AS category_name,
+       COALESCE(SUM(CASE WHEN bh.value IS NOT NULL THEN bh.value ELSE 0 END), 0) AS total_amount
+    FROM "category" c
+    LEFT JOIN "transaction" tr ON tr.categoryid = c.id
+    LEFT JOIN "account" acc ON acc.id = tr.accountid
+    LEFT JOIN "balance_history" bh ON bh.accountid = acc.id
+        AND bh.accountId = '3a04306b-bf00-40be-8149-19415e04d5a8'
+        AND bh.updateDateTime BETWEEN  '2023-12-12' AND '2023-12-15'
+    GROUP BY c.id, c.name;
