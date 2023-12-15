@@ -38,18 +38,18 @@ public class Main {
             // System.out.println(acc.getBalancesHistoryWithDate("3a04306b-bf00-40be-8149-19415e04d5a8", LocalDateTime.of(2023, 12, 8, 17, 0, 0), LocalDateTime.of(2023, 12, 8, 18, 0, 0)));
 
 
-        // TransactionService tran = new TransactionService();
-        // Transaction T1 = new Transaction("Salary", 10_000.0, "CREDIT", "3a04306b-bf00-40be-8149-19415e04d5a8", 1);
-        // Transaction T2 = new Transaction("Salary", 20.0, "CREDIT", "9092d140-e16f-45f9-9476-51166f2b7ff9", 2);
-        // Transaction T3 = new Transaction("Gift", 20_000.0, "DEBIT", "3a04306b-bf00-40be-8149-19415e04d5a8", 3);
-        // Transaction T4 = new Transaction("New shoes", 50_000.0, "DEBIT", "9092d140-e16f-45f9-9476-51166f2b7ff9", 4);
-        // Transaction T5 = new Transaction("Gift", 2000.0, "DEBIT", "3a04306b-bf00-40be-8149-19415e04d5a8", 5);
+        TransactionService tran = new TransactionService();
+        Transaction T1 = new Transaction("Salary", 10_000.0, "CREDIT", "3a04306b-bf00-40be-8149-19415e04d5a8", 1);
+        Transaction T2 = new Transaction("Salary", 20.0, "CREDIT", "9092d140-e16f-45f9-9476-51166f2b7ff9", 2);
+        Transaction T3 = new Transaction("Gift", 20_000.0, "DEBIT", "3a04306b-bf00-40be-8149-19415e04d5a8", 3);
+        Transaction T4 = new Transaction("New shoes", 50_000.0, "DEBIT", "9092d140-e16f-45f9-9476-51166f2b7ff9", 4);
+        Transaction T5 = new Transaction("Gift", 2000.0, "DEBIT", "3a04306b-bf00-40be-8149-19415e04d5a8", 5);
 
             // System.out.println(tran.saveTransaction(T1));
             // System.out.println(tran.saveTransaction(T2));
             // System.out.println(tran.saveTransaction(T3));
             // System.out.println(tran.saveTransaction(T4));
-            // System.out.println(tran.saveTransaction(T5));
+            System.out.println(tran.saveTransaction(T5));
 
             // System.out.println(tran.getTransactionById("f00ff521-eae3-4a99-839c-3437fb7d1522"));
 
