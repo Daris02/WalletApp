@@ -81,8 +81,8 @@ public class TransfertService {
             }
         }
 
-        transactionRepository.save(new Transaction("Transfert", amount, "DEBIT", debtorId, 0));
-        transactionRepository.save(new Transaction("Transfert", finalAmount, "CREDIT", creditorId, 0));
+        transactionRepository.save(new Transaction("Transfert", amount, "DEBIT", debtorId, 1));
+        transactionRepository.save(new Transaction("Transfert", finalAmount, "CREDIT", creditorId, 1));
         
         Transfert transfert = new Transfert(debtorId, creditorId, amount);
         transfertRepository.save(transfert);
