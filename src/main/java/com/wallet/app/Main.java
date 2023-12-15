@@ -7,7 +7,6 @@ import com.wallet.app.model.Transaction;
 import com.wallet.app.model.Transfert;
 import com.wallet.app.service.AccountService;
 import com.wallet.app.service.CurrencyService;
-import com.wallet.app.service.TransactionService;
 import com.wallet.app.service.TransfertService;
 
 import java.time.LocalDateTime;
@@ -51,6 +50,8 @@ public class Main {
             // System.out.println(tran.saveTransaction(T3));
             // System.out.println(tran.saveTransaction(T4));
             // System.out.println(tran.saveTransaction(T5));
+
+            // System.out.println(tran.getTransactionById("f00ff521-eae3-4a99-839c-3437fb7d1522"));
 
             // System.out.println(tran.getTransactionById("f00ff521-eae3-4a99-839c-3437fb7d1522"));
 
