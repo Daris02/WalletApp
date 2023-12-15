@@ -47,7 +47,7 @@ public class TransactionService {
         return accounts;
     }
 
-    public List<Transaction> getALlTransactionsByAccoundId(String id) {
+    public List<Transaction> getAllTransactionsByAccoundId(String id) {
         return transactionRepo.findAllByAccountId(id);
     }
 }
