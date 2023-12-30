@@ -4,25 +4,25 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import com.wallet.app.exception.DatabaseConnectionException;
+
 public class ConnectionDB {
-    static String databaseName = System.getenv("jdbc_url");
-    static String user = System.getenv("user");
-    static String password = System.getenv("password");
-    static Connection connection;
+    private static final String dbUrl = System.getenv("jdbc_url");
+    private static final String dbUsername = System.getenv("user");
+    private static final String dbPassword = System.getenv("password");
 
     // Check Exception : 
     // Uncheck Exception :
 
-    public static Connection createConnection() {
+    public static Connection createConnection(String url, String username, String password) {
         try {
-            if (connection == null) {
-                connection = DriverManager.getConnection(databaseName, user, password);
-                return connection;
-            }
-            return connection;
+                return DriverManager.getConnection(url, username, password);
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            throw new DatabaseConnectionException(e.getMessage());
         }
-        return connection;
+    }
+
+    public static Connection createConnection() {
+        return createConnection(dbUrl, dbUsername, dbPassword);
     }
 }
