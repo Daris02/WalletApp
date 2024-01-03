@@ -3,6 +3,7 @@ package com.wallet.app.repository;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,15 +11,20 @@ import com.wallet.app.config.ConnectionDB;
 import com.wallet.app.model.CurrencyValue;
 
 public class CurrencyValueRepository implements Crud<CurrencyValue> {
-    private final Connection connection = ConnectionDB.createConnection();
 
     @Override
     public CurrencyValue getById(String id) {
-        String sql = "SELECT * FROM \"currency_value\" WHERE id = " + id + ";";
-        CurrencyValue responseSQL = null;
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
 
+        
         try {
-            ResultSet resultSet = connection.createStatement().executeQuery(sql);
+            connection = ConnectionDB.createConnection();
+            statement = connection.createStatement();
+            String sql = "SELECT * FROM \"currency_value\" WHERE id = " + id + ";";
+            resultSet = statement.executeQuery(sql);
+            CurrencyValue responseSQL = null;
 
             while (resultSet.next()) {
                 responseSQL = new CurrencyValue(
@@ -32,18 +38,31 @@ public class CurrencyValueRepository implements Crud<CurrencyValue> {
             return responseSQL;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
+
+        } finally {
+            try {
+                if (resultSet != null) resultSet.close();
+                if (statement != null) statement.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
-        return null;
     }
 
     @Override
     public List<CurrencyValue> findAll() {
-        String sql = "SELECT * FROM \"currency_value\" ORDER BY date_effect;";
-        List<CurrencyValue> responseSQL = new ArrayList<>();
-
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+        
         try {
-            ResultSet resultSet = connection.createStatement().executeQuery(sql);
+            connection = ConnectionDB.createConnection();
+            statement = connection.createStatement();
+            String sql = "SELECT * FROM \"currency_value\" ORDER BY date_effect;";
+            resultSet = statement.executeQuery(sql);
+            List<CurrencyValue> responseSQL = new ArrayList<>();
 
             while (resultSet.next()) {
                 responseSQL.add(new CurrencyValue(
@@ -58,9 +77,17 @@ public class CurrencyValueRepository implements Crud<CurrencyValue> {
             return responseSQL;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
+
+        } finally {
+            try {
+                if (resultSet != null) resultSet.close();
+                if (statement != null) statement.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
-        return null;
     }
 
     @Override
@@ -74,17 +101,30 @@ public class CurrencyValueRepository implements Crud<CurrencyValue> {
     }
 
     @Override
-    public CurrencyValue save(CurrencyValue toSave) {        
-        String sql = "INSERT INTO \"currency_value\" (currency_source, currency_destination, amount) VALUES " +
-            "( " + toSave.getCurrencySource() + ", " + toSave.getCurrencyDestination() + ", " + toSave.getAmount() + " );";
-
+    public CurrencyValue save(CurrencyValue toSave) { 
+        Connection connection = null;
+        Statement statement = null;
+        
         try {
-            connection.createStatement().executeUpdate(sql);
+            connection = ConnectionDB.createConnection();
+            statement = connection.createStatement();
+            String sql = "INSERT INTO \"currency_value\" (currency_source, currency_destination, amount) VALUES " +
+                "( " + toSave.getCurrencySource() + ", " + toSave.getCurrencyDestination() + ", " + toSave.getAmount() + " );";
+            
+            statement.executeUpdate(sql);
             return toSave;
+
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
+
+        } finally {
+            try {
+                if (statement != null) statement.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
-        return null;
     }
 
 }

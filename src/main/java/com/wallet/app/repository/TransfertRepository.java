@@ -3,6 +3,7 @@ package com.wallet.app.repository;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,15 +11,19 @@ import com.wallet.app.config.ConnectionDB;
 import com.wallet.app.model.Transfert;
 
 public class TransfertRepository implements Crud<Transfert> {
-    private final Connection connection = ConnectionDB.createConnection();
 
     @Override
     public Transfert getById(String id) {
-        String sql = "SELECT * FROM \"transfert\" WHERE id = '" + id + "';";
-        Transfert responseSQL = null;
-
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+        
         try {
-            ResultSet resultSet = connection.createStatement().executeQuery(sql);
+            connection = ConnectionDB.createConnection();
+            statement = connection.createStatement();
+            String sql = "SELECT * FROM \"transfert\" WHERE id = '" + id + "';";
+            resultSet = statement.executeQuery(sql);
+            Transfert responseSQL = null;
 
             while (resultSet.next()) {
                 responseSQL = new Transfert(
@@ -32,18 +37,31 @@ public class TransfertRepository implements Crud<Transfert> {
             return responseSQL;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
+
+        } finally {
+            try {
+                if (resultSet != null) resultSet.close();
+                if (statement != null) statement.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
-        return null;
     }
 
     @Override
     public List<Transfert> findAll() {
-        String sql = "SELECT * FROM \"transfert\" ORDER BY datetime;";
-        List<Transfert> responseSQL = new ArrayList<>();
-
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+        
         try {
-            ResultSet resultSet = connection.createStatement().executeQuery(sql);
+            connection = ConnectionDB.createConnection();
+            statement = connection.createStatement();
+            String sql = "SELECT * FROM \"transfert\" ORDER BY datetime;";
+            resultSet = statement.executeQuery(sql);
+            List<Transfert> responseSQL = new ArrayList<>();
 
             while (resultSet.next()) {
                 responseSQL.add(new Transfert(
@@ -58,9 +76,17 @@ public class TransfertRepository implements Crud<Transfert> {
             return responseSQL;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
+
+        } finally {
+            try {
+                if (resultSet != null) resultSet.close();
+                if (statement != null) statement.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
-        return null;
     }
 
     @Override
@@ -75,17 +101,29 @@ public class TransfertRepository implements Crud<Transfert> {
 
     @Override
     public Transfert save(Transfert toSave) {
-        String sql = "INSERT INTO \"transfert\" (amount, accountid1, accountid2) VALUES " +
-        "(" + toSave.getAmount() + ", '" + toSave.getDebtorId() + "' , '" + toSave.getCreditorId() + "' ) ;";
-
+        Connection connection = null;
+        Statement statement = null;
+        
         try {
-            connection.createStatement().executeUpdate(sql);
+            connection = ConnectionDB.createConnection();
+            statement = connection.createStatement();
+            String sql = "INSERT INTO \"transfert\" (amount, accountid1, accountid2) VALUES " +
+            "(" + toSave.getAmount() + ", '" + toSave.getDebtorId() + "' , '" + toSave.getCreditorId() + "' ) ;";
             
+            statement.executeUpdate(sql);
             return toSave;
+
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
+
+        } finally {
+            try {
+                if (statement != null) statement.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
-        return null;
     }
 
 }

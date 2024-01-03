@@ -98,7 +98,6 @@ public class CategoryRepository implements Crud<Category> {
         Connection connection = null;
         Statement statement = null;
 
-        
         try {
             connection = ConnectionDB.createConnection();
             statement = connection.createStatement();

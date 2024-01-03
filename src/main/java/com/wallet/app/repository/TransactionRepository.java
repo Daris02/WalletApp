@@ -3,6 +3,7 @@ package com.wallet.app.repository;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,15 +14,19 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 public class TransactionRepository implements Crud<Transaction> {
-    private final Connection connection = ConnectionDB.createConnection();
     AccountRepository accountRepo = new AccountRepository();
 
     public List<Transaction> findAllByAccountId(String id) {
-        String sql = "SELECT * FROM \"transaction\" WHERE accountid = '" + id + "';";
-        List<Transaction> responseSQL = new ArrayList<>();
-
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+        
         try {
-            ResultSet resultSet = connection.createStatement().executeQuery(sql);
+            connection = ConnectionDB.createConnection();
+            statement = connection.createStatement();
+            String sql = "SELECT * FROM \"transaction\" WHERE accountid = '" + id + "';";
+            resultSet = statement.executeQuery(sql);
+            List<Transaction> responseSQL = new ArrayList<>();
 
             while (resultSet.next()) {
                 responseSQL.add(new Transaction(
@@ -38,18 +43,31 @@ public class TransactionRepository implements Crud<Transaction> {
             return responseSQL;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
+
+        } finally {
+            try {
+                if (resultSet != null) resultSet.close();
+                if (statement != null) statement.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
-        return null;
     }
 
     @Override
     public Transaction getById(String id) {
-        String sql = "SELECT * FROM \"transaction\" WHERE id = '" + id + "';";
-        Transaction responseSQL = null;
-
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+        
         try {
-            ResultSet resultSet = connection.createStatement().executeQuery(sql);
+            connection = ConnectionDB.createConnection();
+            statement = connection.createStatement();
+            String sql = "SELECT * FROM \"transaction\" WHERE id = '" + id + "';";
+            resultSet = statement.executeQuery(sql);
+            Transaction responseSQL = null;
 
             while (resultSet.next()) {
                 responseSQL = new Transaction(
@@ -65,18 +83,31 @@ public class TransactionRepository implements Crud<Transaction> {
             return responseSQL;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
+
+        } finally {
+            try {
+                if (resultSet != null) resultSet.close();
+                if (statement != null) statement.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
-        return null;
     }
 
     @Override
     public List<Transaction> findAll() {
-        String sql = "SELECT  * FROM \"transaction\" ORDER BY datetime;";
-        List<Transaction> responseSQL = new ArrayList<>();
-
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+        
         try {
-            ResultSet resultSet = connection.createStatement().executeQuery(sql);
+            connection = ConnectionDB.createConnection();
+            statement = connection.createStatement();
+            String sql = "SELECT  * FROM \"transaction\" ORDER BY datetime;";
+            resultSet = statement.executeQuery(sql);
+            List<Transaction> responseSQL = new ArrayList<>();
 
             while (resultSet.next()) {
                 responseSQL.add(new Transaction(
@@ -93,9 +124,17 @@ public class TransactionRepository implements Crud<Transaction> {
             return responseSQL;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
+
+        } finally {
+            try {
+                if (resultSet != null) resultSet.close();
+                if (statement != null) statement.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
-        return null;
     }
 
     @Override
@@ -111,50 +150,63 @@ public class TransactionRepository implements Crud<Transaction> {
     @Override
     public Transaction save(Transaction toSave) {
         String sql = "";
-
-        if ("DEBIT".equals(toSave.getType())) {
-            sql = "DO $$" +
-                    "BEGIN" +
-                    "   BEGIN" +
-                    "       INSERT INTO \"balance_history\" (value, accountId) VALUES " +
-                    "           ( (" + accountRepo.getBalanceNow(toSave.getAccountId()).getValue() + " - " + toSave.getAmount() + "), " +
-                    "              '" + toSave.getAccountId() + "' );" +
-                    "       INSERT INTO \"transaction\" (label, amount, transactiontype, accountId,  categoryId) VALUES " +
-                    "           ('" + toSave.getLabel() + "', " + toSave.getAmount() + ", '" + toSave.getType() + "', '" + toSave.getAccountId() + "', " + toSave.getCategoryId() + ");" +
-                    "       EXCEPTION" +
-                    "           WHEN OTHERS THEN" +
-                    "               ROLLBACK;" +
-                    "               RAISE;" +
-                    "   END;" +
-                    "   COMMIT;" +
-                    "END $$;";
-        }
-        
-        if ("CREDIT".equals(toSave.getType())) {
-            sql = "DO $$" +
-                    "BEGIN" +
-                    "   BEGIN" +
-                    "       INSERT INTO \"balance_history\" (value, accountId) VALUES " +
-                    "           ( (" + accountRepo.getBalanceNow(toSave.getAccountId()).getValue() + " + " + toSave.getAmount() + "), " +
-                    "            '" + toSave.getAccountId() + "' );" +
-                    "       INSERT INTO \"transaction\" (label, amount, transactiontype, accountId, categoryId) VALUES " +
-                    "           ('" + toSave.getLabel() + "', " + toSave.getAmount() + ", '" + toSave.getType() + "', '" + toSave.getAccountId() + "', " + toSave.getCategoryId() + ");" +
-                    "       EXCEPTION" +
-                    "           WHEN OTHERS THEN" +
-                    "               ROLLBACK;" +
-                    "               RAISE;" +
-                    "   END;" +
-                    "   COMMIT;" +
-                    "END $$;";
-        }
+        Connection connection = null;
+        Statement statement = null;
         
         try {
-            connection.createStatement().executeUpdate(sql);
+            connection = ConnectionDB.createConnection();
+            statement = connection.createStatement();
+                    
+            if ("DEBIT".equals(toSave.getType())) {
+                sql = "DO $$" +
+                        "BEGIN" +
+                        "   BEGIN" +
+                        "       INSERT INTO \"balance_history\" (value, accountId) VALUES " +
+                        "           ( (" + accountRepo.getBalanceNow(toSave.getAccountId()).getValue() + " - " + toSave.getAmount() + "), " +
+                        "              '" + toSave.getAccountId() + "' );" +
+                        "       INSERT INTO \"transaction\" (label, amount, transactiontype, accountId,  categoryId) VALUES " +
+                        "           ('" + toSave.getLabel() + "', " + toSave.getAmount() + ", '" + toSave.getType() + "', '" + toSave.getAccountId() + "', " + toSave.getCategoryId() + ");" +
+                        "       EXCEPTION" +
+                        "           WHEN OTHERS THEN" +
+                        "               ROLLBACK;" +
+                        "               RAISE;" +
+                        "   END;" +
+                        "   COMMIT;" +
+                        "END $$;";
+            }
+            
+            if ("CREDIT".equals(toSave.getType())) {
+                sql = "DO $$" +
+                        "BEGIN" +
+                        "   BEGIN" +
+                        "       INSERT INTO \"balance_history\" (value, accountId) VALUES " +
+                        "           ( (" + accountRepo.getBalanceNow(toSave.getAccountId()).getValue() + " + " + toSave.getAmount() + "), " +
+                        "            '" + toSave.getAccountId() + "' );" +
+                        "       INSERT INTO \"transaction\" (label, amount, transactiontype, accountId, categoryId) VALUES " +
+                        "           ('" + toSave.getLabel() + "', " + toSave.getAmount() + ", '" + toSave.getType() + "', '" + toSave.getAccountId() + "', " + toSave.getCategoryId() + ");" +
+                        "       EXCEPTION" +
+                        "           WHEN OTHERS THEN" +
+                        "               ROLLBACK;" +
+                        "               RAISE;" +
+                        "   END;" +
+                        "   COMMIT;" +
+                        "END $$;";
+            }
+
+            statement.executeUpdate(sql);
             return toSave;
-        } catch (Exception e) {
-            e.printStackTrace();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+
+        } finally {
+            try {
+                if (statement != null) statement.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
-        return null;
     }
 
 }
