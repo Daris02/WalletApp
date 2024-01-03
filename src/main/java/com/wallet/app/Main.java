@@ -57,21 +57,17 @@ public class Main {
             // System.out.println(tran.saveTransaction(T4));
             // System.out.println(tran.saveTransaction(T5));
 
-            // System.out.println(tran.getTransactionById("f00ff521-eae3-4a99-839c-3437fb7d1522"));
-
-            // System.out.println(tran.getTransactionById("f00ff521-eae3-4a99-839c-3437fb7d1522"));
-
-
+            // System.out.println(tran.getTransactionById("aa9404fd-aa17-4754-89a6-4827495ca000"));
 
         TransfertService traf = new TransfertService();
-            // traf.saveTransfert(id2, id1, 5.0, "median");
+            // System.out.println(traf.saveTransfert(id2, id1, 5.0, "median"));
             // System.out.println(traf.getAllTransferts());
 
 
 
         // Spend Amount ---
-        LocalDateTime start =  LocalDateTime.of(2023, 12, 18, 8, 0, 0);
-        LocalDateTime end = LocalDateTime.of(2023, 12, 22, 8, 0, 0);
+        LocalDateTime start =  LocalDateTime.of(2024, 1, 3, 8, 0, 0);
+        LocalDateTime end = LocalDateTime.of(2024, 1, 4, 8, 0, 0);
             
             // --- SQL
             // System.out.println(acc.getAllTotalSpendAmounts(id1, start, end));
