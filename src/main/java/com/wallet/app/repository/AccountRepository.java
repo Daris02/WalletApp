@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -19,16 +20,20 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 public class AccountRepository implements Crud<Account> {
-    private final Connection connection = ConnectionDB.createConnection();
     private CurrencyRepository currencyRepo = new CurrencyRepository();
 
     @Override
     public Account getById(String id) {
-        String sql = "SELECT * FROM \"account\" WHERE id = '" + id + "';";
-        Account responseSQL = null;
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
 
         try {
-            ResultSet resultSet = connection.createStatement().executeQuery(sql);
+            connection = ConnectionDB.createConnection();
+            statement = connection.createStatement();
+            String sql = "SELECT * FROM \"account\" WHERE id = '" + id + "';";
+            resultSet = statement.executeQuery(sql);
+            Account responseSQL = null;
 
             while (resultSet.next()) {
                 responseSQL = new Account(
@@ -43,18 +48,31 @@ public class AccountRepository implements Crud<Account> {
             return responseSQL;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
+
+        } finally {
+            try {
+                if (resultSet != null) resultSet.close();
+                if (statement != null) statement.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
-        return null;
     }
 
     @Override
     public List<Account> findAll() {
-        String sql = "SELECT  * FROM \"account\" ORDER BY creationdate;";
-        List<Account> responseSQL = new ArrayList<>();
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
 
         try {
-            ResultSet resultSet = connection.createStatement().executeQuery(sql);
+            connection = ConnectionDB.createConnection();
+            statement = connection.createStatement();
+            String sql = "SELECT  * FROM \"account\" ORDER BY creationdate;";
+            resultSet = statement.executeQuery(sql);
+            List<Account> responseSQL = new ArrayList<>();
 
             while (resultSet.next()) {
                 responseSQL.add(new Account(
@@ -70,9 +88,17 @@ public class AccountRepository implements Crud<Account> {
             return responseSQL;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
+
+        } finally {
+            try {
+                if (resultSet != null) resultSet.close();
+                if (statement != null) statement.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
-        return null;
     }
 
     @Override
@@ -87,51 +113,72 @@ public class AccountRepository implements Crud<Account> {
 
     @Override
     public Account save(Account toSave) {
-        toSave.setId(UUID.randomUUID().toString());
-
-        String sql = "DO $$" +
-                "        BEGIN" +
-                "            BEGIN" +
-                "                INSERT INTO \"account\" (id, name, account_type, currencyid) VALUES ( '" + toSave.getId() + "', '" + toSave.getName() + "', '" + toSave.getType() + "', " + toSave.getCurrency().getId() + ");" +
-                "                INSERT INTO \"balance_history\" (accountId) VALUES ('" + toSave.getId() + "' );" +
-                "            EXCEPTION" +
-                "                WHEN OTHERS THEN" +
-                "                    ROLLBACK;" +
-                "                    RAISE;" +
-                "            END;" +
-                "            COMMIT;" +
-                "        END $$;";
-
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+        
         try {
-            connection.createStatement().executeUpdate(sql);
+            toSave.setId(UUID.randomUUID().toString());
+            connection = ConnectionDB.createConnection();
+            statement = connection.createStatement();
+
+            String sql = "DO $$" +
+                    "        BEGIN" +
+                    "            BEGIN" +
+                    "                INSERT INTO \"account\" (id, name, account_type, currencyid) VALUES ( '" + toSave.getId() + "', '" + toSave.getName() + "', '" + toSave.getType() + "', " + toSave.getCurrency().getId() + ");" +
+                    "                INSERT INTO \"balance_history\" (accountId) VALUES ('" + toSave.getId() + "' );" +
+                    "            EXCEPTION" +
+                    "                WHEN OTHERS THEN" +
+                    "                    ROLLBACK;" +
+                    "                    RAISE;" +
+                    "            END;" +
+                    "            COMMIT;" +
+                    "        END $$;";
+
+            resultSet = statement.executeQuery(sql);
             return toSave;
+
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
+
+        } finally {
+            try {
+                if (resultSet != null) resultSet.close();
+                if (statement != null) statement.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
-        return null;
     }
     
     public List<Balance> getBalanceHistory(String id, Timestamp startDatetime, Timestamp endDatetime) {
-        String sql = "";
-        if (startDatetime == null && endDatetime == null) {
-            sql = "SELECT * FROM \"balance_history\" WHERE accountid = ?;";
-        } else {
-            sql = "SELECT * FROM \"balance_history\" WHERE accountid = ? " + 
-                    " AND updatedatetime BETWEEN ? AND ? ;";
-        }
-
-        List<Balance> responseSQL = new ArrayList<>();
-
+        Connection connection = null;
+        PreparedStatement preSt = null;
+        ResultSet resultSet = null;
+        
         try {
-            PreparedStatement preSt = connection.prepareStatement(sql);
+            connection = ConnectionDB.createConnection();
+
+            String sql = "";
+            if (startDatetime == null && endDatetime == null) {
+                sql = "SELECT * FROM \"balance_history\" WHERE accountid = ?;";
+            } else {
+                sql = "SELECT * FROM \"balance_history\" WHERE accountid = ? " + 
+                        " AND updatedatetime BETWEEN ? AND ? ;";
+            }
+
+            preSt = connection.prepareStatement(sql);
             preSt.setObject(1, UUID.fromString(id));
+            
+            List<Balance> responseSQL = new ArrayList<>();
             
             if (startDatetime != null && endDatetime != null) {
                 preSt.setTimestamp(2, startDatetime);
                 preSt.setTimestamp(3, endDatetime);
             }
 
-            ResultSet resultSet = preSt.executeQuery();
+            resultSet = preSt.executeQuery();
             
             while (resultSet.next()) {
                 responseSQL.add(new Balance(
@@ -145,20 +192,34 @@ public class AccountRepository implements Crud<Account> {
             return responseSQL;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                if (resultSet != null) resultSet.close();
+                if (preSt != null) preSt.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
-        return null;
     }
 
     public Balance getBalanceNow(String id) {
-        String sql = "SELECT bh.* FROM \"account\" a INNER JOIN \"balance_history\" bh ON bh.accountid = a.id " +
-                     "WHERE a.id = '" + id + "' " +
-                     "ORDER BY updatedatetime DESC " +
-                     "LIMIT 1;";
-        Balance responseSQL = null;
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
 
         try {
-            ResultSet resultSet = connection.createStatement().executeQuery(sql);
+            connection = ConnectionDB.createConnection();
+            statement = connection.createStatement();
+
+            String sql = "SELECT bh.* FROM \"account\" a INNER JOIN \"balance_history\" bh ON bh.accountid = a.id " +
+                        "WHERE a.id = '" + id + "' " +
+                        "ORDER BY updatedatetime DESC " +
+                        "LIMIT 1;";
+
+            resultSet = statement.executeQuery(sql);
+            Balance responseSQL = null;
 
             while (resultSet.next()) {
                 responseSQL = new Balance(
@@ -171,26 +232,41 @@ public class AccountRepository implements Crud<Account> {
             return responseSQL;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
+
+        } finally {
+            try {
+                if (resultSet != null) resultSet.close();
+                if (statement != null) statement.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
-        return null;
     }
 
     public Map<String, Double> findAllTotalSpendAmount(String accountId, String startDatetime, String endDatetime) {
-        String sql = "  SELECT c.id AS category_id, " +
-                    "      c.name AS category_name, " +
-                    "      (SUM(CASE WHEN bh.value IS NOT NULL THEN bh.value ELSE 0 END)) AS total_amount " +
-                    "  FROM \"category\" c " +
-                    "      LEFT JOIN \"transaction\" tr ON tr.categoryid = c.id " +
-                    "      LEFT JOIN \"account\" acc ON acc.id = tr.accountid " +
-                    "       LEFT JOIN \"balance_history\" bh ON bh.accountid = acc.id " +
-                    "   WHERE bh.accountId = '" + accountId + "' " +
-                    "   AND updateDateTime BETWEEN '" + startDatetime + "' AND '" + endDatetime + "' " +
-                    "   GROUP BY c.id, c.name; ";
-        Map<String, Double> responseSQL = new HashMap<>();
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
 
         try {
-            ResultSet resultSet = connection.createStatement().executeQuery(sql);
+            connection = ConnectionDB.createConnection();
+            statement = connection.createStatement();
+
+            String sql = "  SELECT c.id AS category_id, " +
+                        "      c.name AS category_name, " +
+                        "      (SUM(CASE WHEN bh.value IS NOT NULL THEN bh.value ELSE 0 END)) AS total_amount " +
+                        "  FROM \"category\" c " +
+                        "      LEFT JOIN \"transaction\" tr ON tr.categoryid = c.id " +
+                        "      LEFT JOIN \"account\" acc ON acc.id = tr.accountid " +
+                        "       LEFT JOIN \"balance_history\" bh ON bh.accountid = acc.id " +
+                        "   WHERE bh.accountId = '" + accountId + "' " +
+                        "   AND updateDateTime BETWEEN '" + startDatetime + "' AND '" + endDatetime + "' " +
+                        "   GROUP BY c.id, c.name; ";
+
+            resultSet = statement.executeQuery(sql);
+            Map<String, Double> responseSQL = new HashMap<>();
             
             while (resultSet.next()) {
                 responseSQL.put(resultSet.getString("category_name"), resultSet.getDouble("total_amount"));
@@ -198,8 +274,16 @@ public class AccountRepository implements Crud<Account> {
             return responseSQL;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
+
+        } finally {
+            try {
+                if (resultSet != null) resultSet.close();
+                if (statement != null) statement.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
-        return null;
     }
 }
