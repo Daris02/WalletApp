@@ -37,13 +37,16 @@ public class TransfertService {
             Double rateChange = 0.0;
 
             List<Double> listAmountValues = new ArrayList<>();
+            List<CurrencyValue> listOfCurrencyValues = currencyService.getAllCurrencyValues();
 
-            for (CurrencyValue currencyValue : currencyService.getAllCurrencyValues()) {
+            for (CurrencyValue currencyValue : listOfCurrencyValues) {
                 if (currencyValue.getDateEffect().toLocalDate().equals(LocalDate.now())) {
                     listAmountValues.add(currencyValue.getAmount());
-                    currencyDebitor = currencyService.getCurrencyById(currencyValue.getCurrencySource());
-                    currencyCreditor = currencyService.getCurrencyById(currencyValue.getCurrencyDestination());
+                } else {
+                    listAmountValues.add(listOfCurrencyValues.get(listOfCurrencyValues.size() - 1).getAmount());
                 }
+                currencyDebitor = currencyService.getCurrencyById(currencyValue.getCurrencySource());
+                currencyCreditor = currencyService.getCurrencyById(currencyValue.getCurrencyDestination());
             }
             
             Collections.sort(listAmountValues);
@@ -72,7 +75,6 @@ public class TransfertService {
                 rateChange = median;
             }
 
-            assert currencyDebitor != null;
             if (currencyDebitor.getCode().equals("EUR") && currencyCreditor.getCode().equals("MGA")) {
                 finalAmount = amount * rateChange;
             }
