@@ -11,12 +11,9 @@ public class ConnectionDB {
     private static final String dbUsername = System.getenv("user");
     private static final String dbPassword = System.getenv("password");
 
-    // Check Exception : 
-    // Uncheck Exception :
-
     public static Connection createConnection(String url, String username, String password) {
         try {
-                return DriverManager.getConnection(url, username, password);
+            return DriverManager.getConnection(url, username, password);
         } catch (SQLException e) {
             throw new DatabaseConnectionException(e.getMessage());
         }
