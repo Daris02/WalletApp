@@ -8,6 +8,7 @@ import lombok.*;
 @Setter
 @ToString
 @AllArgsConstructor
+@EqualsAndHashCode
 public class Balance {
     private String id;
     private Double value;
