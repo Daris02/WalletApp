@@ -118,7 +118,9 @@ public class AccountRepository implements Crud<Account> {
         ResultSet resultSet = null;
         
         try {
-            toSave.setId(UUID.randomUUID().toString());
+            if (toSave.getId() == null) {
+                toSave.setId(UUID.randomUUID().toString());
+            }
             connection = ConnectionDB.createConnection();
             statement = connection.createStatement();
 

@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import com.wallet.app.config.ConnectionDB;
 import com.wallet.app.model.Currency;
@@ -106,7 +105,6 @@ public class CurrencyRepository implements Crud<Currency> {
         
         
         try {
-            toSave.setId(UUID.randomUUID().toString());
             connection = ConnectionDB.createConnection();
             statement = connection.createStatement();
             String sql = "INSERT INTO \"currency\" (id, name, code) VALUES " +

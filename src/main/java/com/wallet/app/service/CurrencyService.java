@@ -20,6 +20,8 @@ public class CurrencyService {
     }
 
     public Currency saveCurrency(Currency currency) {
+        Integer id = getAllCurrencies().size();
+        currency.setId(id.toString());
         return currencyRepo.save(currency);
     }
 
