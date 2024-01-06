@@ -115,7 +115,6 @@ public class AccountRepository implements Crud<Account> {
     public Account save(Account toSave) {
         Connection connection = null;
         Statement statement = null;
-        ResultSet resultSet = null;
         
         try {
             if (toSave.getId() == null) {
@@ -137,7 +136,7 @@ public class AccountRepository implements Crud<Account> {
                     "            COMMIT;" +
                     "        END $$;";
 
-            resultSet = statement.executeQuery(sql);
+            statement.executeUpdate(sql);
             return toSave;
 
         } catch (SQLException e) {
@@ -145,7 +144,6 @@ public class AccountRepository implements Crud<Account> {
 
         } finally {
             try {
-                if (resultSet != null) resultSet.close();
                 if (statement != null) statement.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
