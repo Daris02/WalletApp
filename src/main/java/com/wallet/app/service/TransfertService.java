@@ -3,7 +3,7 @@ package com.wallet.app.service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
+import java.util.UUID;
 import java.time.LocalDate;
 
 import com.wallet.app.model.Currency;
@@ -87,6 +87,11 @@ public class TransfertService {
         transactionRepository.save(new Transaction("Transfert", finalAmount, "CREDIT", creditorId, 1));
         
         Transfert transfert = new Transfert(debtorId, creditorId, amount);
+        
+        if (transfert.getId() == null) {
+            transfert.setId(UUID.randomUUID().toString());
+        }
+
         transfertRepository.save(transfert);
         
         return transfert;

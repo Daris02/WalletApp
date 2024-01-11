@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import com.wallet.app.model.Account;
 import com.wallet.app.model.Balance;
@@ -44,13 +45,16 @@ public class AccountService {
         return accounts;
     }
 
-    public Account saveAccount(Account Account, String currencyCode) {
+    public Account saveAccount(Account account, String currencyCode) {
+        if (account.getId() == null) {
+            account.setId(UUID.randomUUID().toString());
+        }
         for (Currency curr : currencyService.getAllCurrencies()) {
             if(curr.getCode().equals(currencyCode)) {
-                Account.setCurrency(curr);
+                account.setCurrency(curr);
             }
         }
-        return accountRepo.save(Account);
+        return accountRepo.save(account);
     }
 
     public List<Account> saveAllAccounts(List<Account> accounts) {
@@ -90,7 +94,6 @@ public class AccountService {
             }
         }
         
-        // return null;
         return allSpendAmounts;
     }
 }

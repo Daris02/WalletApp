@@ -2,6 +2,7 @@ package com.wallet.app.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import com.wallet.app.model.Account;
 import com.wallet.app.model.Category;
@@ -23,6 +24,9 @@ public class TransactionService {
     }
 
     public Account saveTransaction(Transaction transaction) {
+        if (transaction.getId() == null) {
+            transaction.setId(UUID.randomUUID().toString());
+        }
         AccountService accountService = new AccountService();
         Account account = accountService.getAccountById(transaction.getAccountId());
         Double balance = account.getBalance();
