@@ -10,12 +10,11 @@ import com.wallet.app.model.Currency;
 import com.wallet.app.model.CurrencyValue;
 import com.wallet.app.model.Transaction;
 import com.wallet.app.model.Transfert;
-import com.wallet.app.repository.TransactionRepository;
 import com.wallet.app.repository.TransfertRepository;
 
 public class TransfertService {
-    TransactionRepository transactionRepository = new TransactionRepository();
     TransfertRepository transfertRepository = new TransfertRepository();
+    TransactionService transactionService = new TransactionService();
     AccountService accountService = new AccountService();
     CurrencyService currencyService = new CurrencyService();
 
@@ -83,18 +82,16 @@ public class TransfertService {
             }
         }
 
-        transactionRepository.save(new Transaction("Transfert", amount, "DEBIT", debtorId, 1));
-        transactionRepository.save(new Transaction("Transfert", finalAmount, "CREDIT", creditorId, 1));
+        transactionService.saveTransaction(new Transaction("Transfert", amount, "DEBIT", debtorId, 1));
+        transactionService.saveTransaction(new Transaction("Transfert", finalAmount, "CREDIT", creditorId, 1));
         
         Transfert transfert = new Transfert(debtorId, creditorId, amount);
-        
+
         if (transfert.getId() == null) {
             transfert.setId(UUID.randomUUID().toString());
         }
-
-        transfertRepository.save(transfert);
         
-        return transfert;
+        return transfertRepository.save(transfert);
     }
     
 }
