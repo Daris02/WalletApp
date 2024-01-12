@@ -58,13 +58,13 @@ public class TransactionRepository implements Crud<Transaction> {
 
     @Override
     public Transaction getById(String id) {
-        return (Transaction) ImplementationMethod.findById(id, "transaction");
+        return (Transaction) AutoCrud.findById(id, "transaction");
     }
 
     @Override
     public List<Transaction> findAll() {
         List<Transaction> listTransactions = new ArrayList<>();
-        for (Object object : ImplementationMethod.findAll("Transaction")) {
+        for (Object object : AutoCrud.findAll("Transaction")) {
             listTransactions.add((Transaction)object);
         }
         return listTransactions;
@@ -82,7 +82,7 @@ public class TransactionRepository implements Crud<Transaction> {
 
     @Override
     public Transaction save(Transaction toSave) {
-        ImplementationMethod.save(toSave);
+        AutoCrud.save(toSave);
         return getById(toSave.getId());
     }
 

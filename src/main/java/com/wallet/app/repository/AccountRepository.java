@@ -23,13 +23,13 @@ public class AccountRepository implements Crud<Account> {
 
     @Override
     public Account getById(String id) {
-        return (Account) ImplementationMethod.findById(id, "account");
+        return (Account) AutoCrud.findById(id, "account");
     }
 
     @Override
     public List<Account> findAll() {
         List<Account> listAccounts = new ArrayList<>();
-        for (Object object : ImplementationMethod.findAll("account")) {
+        for (Object object : AutoCrud.findAll("account")) {
             listAccounts.add((Account)object);
         }
         return listAccounts;
@@ -47,7 +47,7 @@ public class AccountRepository implements Crud<Account> {
 
     @Override
     public Account save(Account toSave) {
-        ImplementationMethod.save(toSave);
+        AutoCrud.save(toSave);
         return getById(toSave.getId());
     }
     

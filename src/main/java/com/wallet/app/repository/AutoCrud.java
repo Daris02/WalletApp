@@ -15,7 +15,7 @@ import com.wallet.app.model.CurrencyValue;
 import com.wallet.app.model.Transaction;
 import com.wallet.app.model.Transfert;
 
-public class ImplementationMethod {
+public class AutoCrud {
 
     public static Object findById(String id, String table) {
         Connection connection = null;

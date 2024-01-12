@@ -9,13 +9,13 @@ public class TransfertRepository implements Crud<Transfert> {
 
     @Override
     public Transfert getById(String id) {
-        return (Transfert) ImplementationMethod.findById(id, "transfert");
+        return (Transfert) AutoCrud.findById(id, "transfert");
     }
 
     @Override
     public List<Transfert> findAll() {
         List<Transfert> listTransferts = new ArrayList<>();
-        for (Object object : ImplementationMethod.findAll("transfert")) {
+        for (Object object : AutoCrud.findAll("transfert")) {
             listTransferts.add((Transfert)object);
         }
         return listTransferts;
@@ -33,7 +33,7 @@ public class TransfertRepository implements Crud<Transfert> {
 
     @Override
     public Transfert save(Transfert toSave) {
-        ImplementationMethod.save(toSave);
+        AutoCrud.save(toSave);
         return getById(toSave.getId());
     }
 

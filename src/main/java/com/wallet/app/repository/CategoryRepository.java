@@ -14,13 +14,13 @@ public class CategoryRepository implements Crud<Category> {
 
     @Override
     public Category getById(String id) {
-        return (Category) ImplementationMethod.findById(id, "category");
+        return (Category) AutoCrud.findById(id, "category");
     }
 
     @Override
     public List<Category> findAll() {
         List<Category> listCategories = new ArrayList<>();
-        for (Object object : ImplementationMethod.findAll("category")) {
+        for (Object object : AutoCrud.findAll("category")) {
             listCategories.add((Category)object);
         }
         return listCategories;
@@ -38,7 +38,7 @@ public class CategoryRepository implements Crud<Category> {
 
     @Override
     public Category save(Category toSave) {
-        ImplementationMethod.save(toSave);
+        AutoCrud.save(toSave);
         return getById(toSave.getId().toString());
     }
     

@@ -12,13 +12,13 @@ public class CurrencyRepository implements Crud<Currency> {
 
     @Override
     public Currency getById(String id) {
-        return (Currency) ImplementationMethod.findById(id, "currency");
+        return (Currency) AutoCrud.findById(id, "currency");
     }
 
     @Override
     public List<Currency> findAll() {
         List<Currency> listCurrencies = new ArrayList<>();
-        for (Object object : ImplementationMethod.findAll("currency")) {
+        for (Object object : AutoCrud.findAll("currency")) {
             listCurrencies.add((Currency)object);
         }
         return listCurrencies;
@@ -36,7 +36,7 @@ public class CurrencyRepository implements Crud<Currency> {
 
     @Override
     public Currency save(Currency toSave) {
-        ImplementationMethod.save(toSave);
+        AutoCrud.save(toSave);
         return getById(toSave.getId());
     }
     
