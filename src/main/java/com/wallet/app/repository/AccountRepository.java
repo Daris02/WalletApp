@@ -24,41 +24,6 @@ public class AccountRepository implements Crud<Account> {
     @Override
     public Account getById(String id) {
         return (Account) ImplementationMethod.findById(id, "account");
-        // Connection connection = null;
-        // Statement statement = null;
-        // ResultSet resultSet = null;
-
-        // try {
-        //     connection = ConnectionDB.createConnection();
-        //     statement = connection.createStatement();
-        //     String sql = "SELECT * FROM \"account\" WHERE id = '" + id + "';";
-        //     resultSet = statement.executeQuery(sql);
-        //     Account responseSQL = null;
-
-        //     while (resultSet.next()) {
-        //         responseSQL = new Account(
-        //                 resultSet.getString("id"),
-        //                 resultSet.getString("name"),
-        //                 0.0,
-        //                 resultSet.getTimestamp("creationdate"),
-        //                 resultSet.getString("account_type"),
-        //                 currencyRepo.getById(resultSet.getString("currencyid"))
-        //             );
-        //     }
-        //     return responseSQL;
-
-        // } catch (SQLException e) {
-        //     throw new RuntimeException(e);
-
-        // } finally {
-        //     try {
-        //         if (resultSet != null) resultSet.close();
-        //         if (statement != null) statement.close();
-        //         if (connection != null) connection.close();
-        //     } catch (SQLException e) {
-        //         throw new RuntimeException(e);
-        //     }
-        // }
     }
 
     @Override
@@ -68,42 +33,6 @@ public class AccountRepository implements Crud<Account> {
             listAccounts.add((Account)object);
         }
         return listAccounts;
-        // Connection connection = null;
-        // Statement statement = null;
-        // ResultSet resultSet = null;
-
-        // try {
-        //     connection = ConnectionDB.createConnection();
-        //     statement = connection.createStatement();
-        //     String sql = "SELECT  * FROM \"account\" ORDER BY creationdate;";
-        //     resultSet = statement.executeQuery(sql);
-        //     List<Account> responseSQL = new ArrayList<>();
-
-        //     while (resultSet.next()) {
-        //         responseSQL.add(new Account(
-        //                 resultSet.getString("id"),
-        //                 resultSet.getString("name"),
-        //                 0.0,
-        //                 resultSet.getTimestamp("creationdate"),
-        //                 resultSet.getString("account_type"),
-        //                 currencyRepo.getById(resultSet.getString("currencyid"))
-        //             )
-        //         );
-        //     }
-        //     return responseSQL;
-
-        // } catch (SQLException e) {
-        //     throw new RuntimeException(e);
-
-        // } finally {
-        //     try {
-        //         if (resultSet != null) resultSet.close();
-        //         if (statement != null) statement.close();
-        //         if (connection != null) connection.close();
-        //     } catch (SQLException e) {
-        //         throw new RuntimeException(e);
-        //     }
-        // }
     }
 
     @Override
@@ -120,43 +49,6 @@ public class AccountRepository implements Crud<Account> {
     public Account save(Account toSave) {
         ImplementationMethod.save(toSave);
         return getById(toSave.getId());
-        // Connection connection = null;
-        // Statement statement = null;
-        
-        // try {
-        //     if (toSave.getId() == null) {
-        //         toSave.setId(UUID.randomUUID().toString());
-        //     }
-        //     connection = ConnectionDB.createConnection();
-        //     statement = connection.createStatement();
-
-        //     String sql = "DO $$" +
-        //             "        BEGIN" +
-        //             "            BEGIN" +
-        //             "                INSERT INTO \"account\" (id, name, account_type, currencyid) VALUES ( '" + toSave.getId() + "', '" + toSave.getName() + "', '" + toSave.getType() + "', " + toSave.getCurrency().getId() + ");" +
-        //             "                INSERT INTO \"balance_history\" (accountId) VALUES ('" + toSave.getId() + "' );" +
-        //             "            EXCEPTION" +
-        //             "                WHEN OTHERS THEN" +
-        //             "                    ROLLBACK;" +
-        //             "                    RAISE;" +
-        //             "            END;" +
-        //             "            COMMIT;" +
-        //             "        END $$;";
-
-        //     statement.executeUpdate(sql);
-        //     return toSave;
-
-        // } catch (SQLException e) {
-        //     throw new RuntimeException(e);
-
-        // } finally {
-        //     try {
-        //         if (statement != null) statement.close();
-        //         if (connection != null) connection.close();
-        //     } catch (SQLException e) {
-        //         throw new RuntimeException(e);
-        //     }
-        // }
     }
     
     public List<Balance> getBalanceHistory(String id, Timestamp startDatetime, Timestamp endDatetime) {
