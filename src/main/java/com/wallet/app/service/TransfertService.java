@@ -23,8 +23,8 @@ public class TransfertService {
     }
     
     public Transfert saveTransfert(String debtorId, String creditorId, Double amount, String currencyValueChoice) {
-        String currencyDebitorId = accountService.getAccountById(debtorId).getCurrency().getId();
-        String currencyCreditorId = accountService.getAccountById(creditorId).getCurrency().getId();
+        Integer currencyDebitorId = accountService.getAccountById(debtorId).getCurrency().getId();
+        Integer currencyCreditorId = accountService.getAccountById(creditorId).getCurrency().getId();
         Double finalAmount = 0.0;
         
         if (debtorId == creditorId) {

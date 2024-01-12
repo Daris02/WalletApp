@@ -11,7 +11,7 @@ public class CurrencyService {
     private CurrencyRepository currencyRepo = new CurrencyRepository();
     private CurrencyValueRepository currencyValueRepo = new CurrencyValueRepository();
 
-    public Currency getCurrencyById(String id) {
+    public Currency getCurrencyById(Integer id) {
         return currencyRepo.getById(id);
     }
 
@@ -21,7 +21,7 @@ public class CurrencyService {
 
     public Currency saveCurrency(Currency currency) {
         Integer id = getAllCurrencies().size();
-        currency.setId(id.toString());
+        currency.setId(id);
         return currencyRepo.save(currency);
     }
 
@@ -33,7 +33,7 @@ public class CurrencyService {
         return currencyValueRepo.findAll();
     }
 
-    public CurrencyValue getCurrencyValueById(String id) {
+    public CurrencyValue getCurrencyValueById(Integer id) {
         return currencyValueRepo.getById(id);
     }
 

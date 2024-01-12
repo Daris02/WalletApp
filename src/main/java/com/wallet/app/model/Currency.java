@@ -9,7 +9,7 @@ import lombok.*;
 @ToString
 @EqualsAndHashCode
 public class Currency {
-    private String id;
+    private Integer id;
     private String name;
     private String code;
     
