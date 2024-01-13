@@ -21,7 +21,7 @@ public class CurrencyService {
 
     public Currency saveCurrency(Currency currency) {
         Integer id = getAllCurrencies().size();
-        currency.setId(id);
+        currency.setId(id == 0 ? id = 1 : id + 1);
         return currencyRepo.save(currency);
     }
 
