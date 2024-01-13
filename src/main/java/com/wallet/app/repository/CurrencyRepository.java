@@ -1,5 +1,7 @@
 package com.wallet.app.repository;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,20 +10,25 @@ import com.wallet.app.model.Currency;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class CurrencyRepository implements Crud<Currency> {
-
+public class CurrencyRepository extends AutoCrud<Currency, Integer> {
+    
     @Override
-    public Currency getById(String id) {
-        return (Currency) AutoCrud.findById(id, "currency");
+    protected String getTableName() {
+        return "currency";
     }
-
+    
     @Override
-    public List<Currency> findAll() {
-        List<Currency> listCurrencies = new ArrayList<>();
-        for (Object object : AutoCrud.findAll("currency")) {
-            listCurrencies.add((Currency)object);
+    protected Currency mapResultSetToEntity(ResultSet resultSet) {
+        try {
+            return new Currency(
+                resultSet.getInt("id"),
+                resultSet.getString("name"),
+                resultSet.getString("code")
+            );
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        return listCurrencies;
+        return null;
     }
 
     @Override
@@ -32,12 +39,6 @@ public class CurrencyRepository implements Crud<Currency> {
             saveAll.add(getById(currency.getId()));
         }
         return saveAll;
-    }
-
-    @Override
-    public Currency save(Currency toSave) {
-        AutoCrud.save(toSave);
-        return getById(toSave.getId());
     }
     
 }

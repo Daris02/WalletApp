@@ -1,38 +1,43 @@
 package com.wallet.app.repository;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Timestamp;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.wallet.app.config.ConnectionDB;
 import com.wallet.app.model.Account;
-import com.wallet.app.model.Balance;
 
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class AccountRepository implements Crud<Account> {
-
+public class AccountRepository extends AutoCrud<Account, String> {
+    CurrencyRepository currencyRepository = new CurrencyRepository();
+    
     @Override
-    public Account getById(String id) {
-        return (Account) AutoCrud.findById(id, "account");
+    protected String getTableName() {
+        return "account";
     }
-
+    
     @Override
-    public List<Account> findAll() {
-        List<Account> listAccounts = new ArrayList<>();
-        for (Object object : AutoCrud.findAll("account")) {
-            listAccounts.add((Account)object);
+    protected Account mapResultSetToEntity(ResultSet resultSet) {
+        try {
+            return new Account(
+                resultSet.getString("id"),
+                resultSet.getString("name"),
+                0.0,
+                resultSet.getTimestamp("creationdate"),
+                resultSet.getString("type"),
+                resultSet.getInt("currencyid")
+            );
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        return listAccounts;
+        return null;
     }
 
     @Override
@@ -44,106 +49,7 @@ public class AccountRepository implements Crud<Account> {
         }
         return saveAll;
     }
-
-    @Override
-    public Account save(Account toSave) {
-        AutoCrud.save(toSave);
-        return getById(toSave.getId());
-    }
     
-    public List<Balance> getBalanceHistory(String id, Timestamp startDatetime, Timestamp endDatetime) {
-        Connection connection = null;
-        PreparedStatement preSt = null;
-        ResultSet resultSet = null;
-        
-        try {
-            connection = ConnectionDB.createConnection();
-
-            String sql = "";
-            if (startDatetime == null && endDatetime == null) {
-                sql = "SELECT * FROM \"balance_history\" WHERE accountid = ?;";
-            } else {
-                sql = "SELECT * FROM \"balance_history\" WHERE accountid = ? " + 
-                        " AND updatedatetime BETWEEN ? AND ? ;";
-            }
-
-            preSt = connection.prepareStatement(sql);
-            preSt.setObject(1, UUID.fromString(id));
-            
-            List<Balance> responseSQL = new ArrayList<>();
-            
-            if (startDatetime != null && endDatetime != null) {
-                preSt.setTimestamp(2, startDatetime);
-                preSt.setTimestamp(3, endDatetime);
-            }
-
-            resultSet = preSt.executeQuery();
-            
-            while (resultSet.next()) {
-                responseSQL.add(new Balance(
-                        resultSet.getString("id"),
-                        resultSet.getDouble("value"),
-                        resultSet.getTimestamp("updatedatetime"),
-                        resultSet.getString("accountid")
-                ));
-            }
-
-            return responseSQL;
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            try {
-                if (resultSet != null) resultSet.close();
-                if (preSt != null) preSt.close();
-                if (connection != null) connection.close();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    public Balance getBalanceNow(String id) {
-        Connection connection = null;
-        Statement statement = null;
-        ResultSet resultSet = null;
-
-        try {
-            connection = ConnectionDB.createConnection();
-            statement = connection.createStatement();
-
-            String sql = "SELECT bh.* FROM \"account\" a INNER JOIN \"balance_history\" bh ON bh.accountid = a.id " +
-                        "WHERE a.id = '" + id + "' " +
-                        "ORDER BY updatedatetime DESC " +
-                        "LIMIT 1;";
-
-            resultSet = statement.executeQuery(sql);
-            Balance responseSQL = null;
-
-            while (resultSet.next()) {
-                responseSQL = new Balance(
-                        resultSet.getString("id"),
-                        resultSet.getDouble("value"),
-                        resultSet.getTimestamp("updatedatetime"),
-                        resultSet.getString("accountid")
-                    );
-            }
-            return responseSQL;
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-
-        } finally {
-            try {
-                if (resultSet != null) resultSet.close();
-                if (statement != null) statement.close();
-                if (connection != null) connection.close();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
     public Map<String, Double> findAllTotalSpendAmount(String accountId, String startDatetime, String endDatetime) {
         Connection connection = null;
         Statement statement = null;

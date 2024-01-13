@@ -1,24 +1,33 @@
 package com.wallet.app.repository;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.wallet.app.model.Transfert;
 
-public class TransfertRepository implements Crud<Transfert> {
-
+public class TransfertRepository extends AutoCrud<Transfert, String> {
+    
     @Override
-    public Transfert getById(String id) {
-        return (Transfert) AutoCrud.findById(id, "transfert");
+    protected String getTableName() {
+        return "transfert";
     }
-
+    
     @Override
-    public List<Transfert> findAll() {
-        List<Transfert> listTransferts = new ArrayList<>();
-        for (Object object : AutoCrud.findAll("transfert")) {
-            listTransferts.add((Transfert)object);
+    protected Transfert mapResultSetToEntity(ResultSet resultSet) {
+        try {
+            return new Transfert(
+                resultSet.getString("id"),
+                resultSet.getDouble("amount"),
+                resultSet.getTimestamp("datetime"),
+                resultSet.getString("debtorId"),
+                resultSet.getString("creditorId")
+            );
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        return listTransferts;
+        return null;
     }
 
     @Override
@@ -30,11 +39,4 @@ public class TransfertRepository implements Crud<Transfert> {
         }
         return saveAll;
     }
-
-    @Override
-    public Transfert save(Transfert toSave) {
-        AutoCrud.save(toSave);
-        return getById(toSave.getId());
-    }
-
 }

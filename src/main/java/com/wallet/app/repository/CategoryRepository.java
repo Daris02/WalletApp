@@ -1,29 +1,30 @@
 package com.wallet.app.repository;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.wallet.app.config.ConnectionDB;
 import com.wallet.app.model.Category;
 
-public class CategoryRepository implements Crud<Category> {
+public class CategoryRepository extends AutoCrud<Category, Integer> {
 
     @Override
-    public Category getById(String id) {
-        return (Category) AutoCrud.findById(id, "category");
+    protected String getTableName() {
+        return "category";
     }
-
+    
     @Override
-    public List<Category> findAll() {
-        List<Category> listCategories = new ArrayList<>();
-        for (Object object : AutoCrud.findAll("category")) {
-            listCategories.add((Category)object);
+    protected Category mapResultSetToEntity(ResultSet resultSet) {
+        try {
+            return new Category(
+                resultSet.getInt("id"),
+                resultSet.getString("name")
+            );
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        return listCategories;
+        return null;
     }
 
     @Override
@@ -31,48 +32,8 @@ public class CategoryRepository implements Crud<Category> {
         List<Category> saveAll = new ArrayList<>();
         for (Category category : toSave) {
             save(category);
-            saveAll.add(getByName(category.getName()));
+            saveAll.add(category);
         }
         return saveAll;
-    }
-
-    @Override
-    public Category save(Category toSave) {
-        AutoCrud.save(toSave);
-        return getById(toSave.getId().toString());
-    }
-    
-    public Category getByName(String name) {
-        Connection connection = null;
-        Statement statement = null;
-        ResultSet resultSet = null;
-        
-        try {
-            connection = ConnectionDB.createConnection();
-            statement = connection.createStatement();
-            String sql = "SELECT * FROM \"category\" WHERE name = " + name + ";";
-            resultSet = statement.executeQuery(sql);
-            Category responseSQL = null;
-
-            while (resultSet.next()) {
-                responseSQL = new Category(
-                        resultSet.getInt("id"),
-                        resultSet.getString("name")
-                    );
-            }
-            return responseSQL;
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-
-        } finally {
-            try {
-                if (resultSet != null) resultSet.close();
-                if (statement != null) statement.close();
-                if (connection != null) connection.close();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        }
     }
 }
