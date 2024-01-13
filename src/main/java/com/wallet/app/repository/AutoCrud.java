@@ -1,50 +1,83 @@
 package com.wallet.app.repository;
 
+import java.lang.reflect.Field;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import com.wallet.app.config.ConnectionDB;
-import com.wallet.app.model.Account;
-import com.wallet.app.model.Category;
-import com.wallet.app.model.Currency;
-import com.wallet.app.model.CurrencyValue;
-import com.wallet.app.model.Transaction;
-import com.wallet.app.model.Transfert;
 
-public class AutoCrud {
+public abstract class AutoCrud<T, ID> implements Crud<T, ID>{
 
-    public static Object findById(String id, String table) {
+    protected abstract String getTableName();
+    
+    @Override
+    public T getById(ID id) {
         Connection connection = null;
-        Statement statement = null;
+        PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
-        
+        UUID _id;
+        String query = "SELECT * FROM " + getTableName() + " WHERE id = ?";
+
         try {
             connection = ConnectionDB.createConnection();
-            statement = connection.createStatement();
+            preparedStatement = connection.prepareStatement(query);
             
-            String sql = "SELECT * FROM \""+ table +"\" WHERE id = '" + id + "';";
-            
-            resultSet = statement.executeQuery(sql);
-
-            Object objectResult = null;
-
-            while (resultSet.next()) {
-                objectResult = createResultSet(resultSet, table, objectResult);
+            if (id.getClass().equals(query.getClass())) {
+                _id = UUID.fromString((String) id);
+                preparedStatement.setObject(1, _id);
+            } else {
+                preparedStatement.setObject(1, id);
             }
-
-            return objectResult;
-
+            
+            resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return mapResultSetToEntity(resultSet);
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
 
         } finally {
             try {
                 if (resultSet != null) resultSet.close();
-                if (statement != null) statement.close();
+                if (preparedStatement != null) preparedStatement.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public List<T> findAll() {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        String query = "SELECT * FROM " + getTableName();
+        List<T> listAll = new ArrayList<>();
+
+        try {
+            connection = ConnectionDB.createConnection();
+            preparedStatement = connection.prepareStatement(query);
+
+            resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                listAll.add(mapResultSetToEntity(resultSet));
+            }
+            return listAll;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+
+        } finally {
+            try {
+                if (resultSet != null) resultSet.close();
+                if (preparedStatement != null) preparedStatement.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
@@ -52,56 +85,57 @@ public class AutoCrud {
         }
     }
 
-    public static List<Object> findAll(String table) {
-        Connection connection = null;
-        Statement statement = null;
-        ResultSet resultSet = null;
-
-        try {
-            connection = ConnectionDB.createConnection();
-            statement = connection.createStatement();
-
-            String sql = "SELECT  * FROM \""+ table +"\";";
-            
-            resultSet = statement.executeQuery(sql);
-            
-            List<Object> listObjectResult = new ArrayList<>();
-            Object objectResult = null;
-
-            while (resultSet.next()) {
-                listObjectResult.add(createResultSet(resultSet, table, objectResult));
-            }
-            return listObjectResult;
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-
-        } finally {
-            try {
-                if (resultSet != null) resultSet.close();
-                if (statement != null) statement.close();
-                if (connection != null) connection.close();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        }
+    @Override
+    public List<T> saveAll(List<T> toSave) {
+        return null;
     }
 
-    public static Object save(Object toSave) {
+    @Override
+    public T save(T toSave) {
         Connection connection = null;
         Statement statement = null;
-        String sql = "";
-        
+
         try {
             connection = ConnectionDB.createConnection();
             statement = connection.createStatement();
 
-            sql = createSql(toSave);
+            Class<?> toSaveClass = toSave.getClass();
 
-            statement.executeUpdate(sql);
+            Field[] fields = toSaveClass.getDeclaredFields();
+    
+            StringBuilder queryBuilder = new StringBuilder("INSERT INTO " + getTableName() + " (");
+                for (Field field : fields) {
+                    if (field.getName().equals("balance") || field.getType().equals(List.class)) {
+                        continue;
+                    } else if (field.getName() == "currency") {
+                        queryBuilder.append("currencyid").append(", ");
+                    } else {
+                        queryBuilder.append(field.getName()).append(", ");
+                    }
+                }
+                queryBuilder.delete(queryBuilder.length() - 2, queryBuilder.length());
+                queryBuilder.append(") VALUES ( ");
+                for (Field field : fields) {
+                    field.setAccessible(true);
+                    Object value = field.get(toSave);
+                    if (field.getName().equals("balance") || field.getType().equals(List.class)) {
+                        continue;
+                    } else if (field.getType().equals(Integer.class) || field.getType().equals(Double.class)) {
+                        queryBuilder.append(value + ", ");
+                    }else {
+                        queryBuilder.append("'" + value + "', ");
+                    }
+                }
+                queryBuilder.delete(queryBuilder.length() - 2, queryBuilder.length());
+                queryBuilder.append(")");
+    
+                String insertQuery = queryBuilder.toString();
+
+            // System.out.println(insertQuery);
+            statement.executeUpdate(insertQuery);
             return toSave;
 
-        } catch (SQLException e) {
+        } catch (SQLException | IllegalArgumentException | IllegalAccessException e) {
             throw new RuntimeException(e);
 
         } finally {
@@ -113,162 +147,48 @@ public class AutoCrud {
             }
         }
     }
-    
-    public static void deleteById(String id) {
 
-    }
+    protected abstract T mapResultSetToEntity(ResultSet resultSet);
 
-    private static Object createResultSet(ResultSet resultSet, String table, Object obj) {
-        CurrencyRepository currencyRepository = new CurrencyRepository();
+    // private static String createSql(Object obj) {
+    //     if (obj.getClass().equals(Transaction.class)) {
+    //         Transaction toSave = (Transaction) obj;
 
-        try {
-            if (table.equals("account")) {
-                obj = new Account(
-                    resultSet.getString("id"),
-                    resultSet.getString("name"),
-                    0.0,
-                    resultSet.getTimestamp("creationdate"),
-                    resultSet.getString("account_type"),
-                    currencyRepository.getById(resultSet.getString("currencyid"))
-                );
-                return obj;
-            }
+    //         if ("DEBIT".equals(toSave.getType())) {
+    //             return "DO $$" +
+    //                     "BEGIN" +
+    //                     "   BEGIN" +
+    //                     "       INSERT INTO \"balance_history\" (value, accountId) VALUES " +
+    //                     "           ( (" + accountRepository.getBalanceNow(toSave.getAccountId()).getValue() + " - " + toSave.getAmount() + "), " +
+    //                     "              '" + toSave.getAccountId() + "' );" +
+    //                     "       INSERT INTO \"transaction\" (label, amount, transactiontype, accountId,  categoryId) VALUES " +
+    //                     "           ('" + toSave.getLabel() + "', " + toSave.getAmount() + ", '" + toSave.getType() + "', '" + toSave.getAccountId() + "', " + toSave.getCategoryId() + ");" +
+    //                     "       EXCEPTION" +
+    //                     "           WHEN OTHERS THEN" +
+    //                     "               ROLLBACK;" +
+    //                     "               RAISE;" +
+    //                     "   END;" +
+    //                     "   COMMIT;" +
+    //                     "END $$;";
+    //         }
             
-            if (table.equals("currency")) {
-                return new Currency(
-                    resultSet.getString("id"),
-                    resultSet.getString("name"),
-                    resultSet.getString("code")
-                );
-            }
-            
-            if (table.equals("currency_value")) {
-                return new CurrencyValue(
-                    resultSet.getInt("id"),
-                    resultSet.getString("currency_source"),
-                    resultSet.getString("currency_destination"),
-                    resultSet.getDouble("amount"),
-                    resultSet.getTimestamp("date_effect").toLocalDateTime()
-                );
-            }
-
-            if (table.equals("category")) {
-                return new Category(
-                    resultSet.getInt("id"),
-                    resultSet.getString("name")
-                );
-            }
-
-            if (table.equals("transaction")) {
-                return new Transaction(
-                    resultSet.getString("id"),
-                    resultSet.getString("label"),
-                    resultSet.getDouble("amount"),
-                    resultSet.getString("transactiontype"),
-                    resultSet.getTimestamp("datetime"),
-                    resultSet.getString("accountid"),
-                    resultSet.getInt("categoryid")
-                );
-            }
-
-            if (table.equals("transfert")) {
-                return new Transfert(
-                    resultSet.getString("id"),
-                    resultSet.getString("accountId1"),
-                    resultSet.getString("accountId2"),
-                    resultSet.getDouble("amount"),
-                    resultSet.getTimestamp("datetime")
-                );
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private static String createSql(Object obj) {
-        AccountRepository accountRepository = new AccountRepository();
-
-        if (obj.getClass().equals(Account.class)) {
-            Account toSave = (Account) obj;
-            return "DO $$" +
-            "        BEGIN" +
-            "            BEGIN" +
-            "                INSERT INTO \"account\" (id, name, account_type, currencyid) VALUES ( '" + toSave.getId() + "', '" + toSave.getName() + "', '" + toSave.getType() + "', " + toSave.getCurrency().getId() + ");" +
-            "                INSERT INTO \"balance_history\" (accountId) VALUES ('" + toSave.getId() + "' );" +
-            "            EXCEPTION" +
-            "                WHEN OTHERS THEN" +
-            "                    ROLLBACK;" +
-            "                    RAISE;" +
-            "            END;" +
-            "            COMMIT;" +
-            "        END $$;";
-        }
-
-        if (obj.getClass().equals(Currency.class)) {
-            Currency toSave = (Currency) obj;
-            return "INSERT INTO \"currency\" (id, name, code) VALUES " +
-            "( '" + toSave.getId() + "', '" + toSave.getName() + "', '" + toSave.getCode() + "'  );";
-        }
+    //         if ("CREDIT".equals(toSave.getType())) {
+    //             return "DO $$" +
+    //                     "BEGIN" +
+    //                     "   BEGIN" +
+    //                     "       INSERT INTO \"balance_history\" (value, accountId) VALUES " +
+    //                     "           ( (" + accountRepository.getBalanceNow(toSave.getAccountId()).getValue() + " + " + toSave.getAmount() + "), " +
+    //                     "            '" + toSave.getAccountId() + "' );" +
+    //                     "       INSERT INTO \"transaction\" (label, amount, transactiontype, accountId, categoryId) VALUES " +
+    //                     "           ('" + toSave.getLabel() + "', " + toSave.getAmount() + ", '" + toSave.getType() + "', '" + toSave.getAccountId() + "', " + toSave.getCategoryId() + ");" +
+    //                     "       EXCEPTION" +
+    //                     "           WHEN OTHERS THEN" +
+    //                     "               ROLLBACK;" +
+    //                     "               RAISE;" +
+    //                     "   END;" +
+    //                     "   COMMIT;" +
+    //                     "END $$;";
+    //         }
+    //     }
         
-        if (obj.getClass().equals(CurrencyValue.class)) {
-            CurrencyValue toSave = (CurrencyValue) obj;
-            return "INSERT INTO \"currency_value\" (currency_source, currency_destination, amount) VALUES " +
-                "( " + toSave.getCurrencySource() + ", " + toSave.getCurrencyDestination() + ", " + toSave.getAmount() + " );";
-        }
-        
-        if (obj.getClass().equals(Category.class)) {
-            Category toSave = (Category) obj;
-            return "INSERT INTO \"category\" (name) VALUES ('" + toSave.getName() + "');";
-        }
-        
-        if (obj.getClass().equals(Transaction.class)) {
-            Transaction toSave = (Transaction) obj;
-
-            if ("DEBIT".equals(toSave.getType())) {
-                return "DO $$" +
-                        "BEGIN" +
-                        "   BEGIN" +
-                        "       INSERT INTO \"balance_history\" (value, accountId) VALUES " +
-                        "           ( (" + accountRepository.getBalanceNow(toSave.getAccountId()).getValue() + " - " + toSave.getAmount() + "), " +
-                        "              '" + toSave.getAccountId() + "' );" +
-                        "       INSERT INTO \"transaction\" (label, amount, transactiontype, accountId,  categoryId) VALUES " +
-                        "           ('" + toSave.getLabel() + "', " + toSave.getAmount() + ", '" + toSave.getType() + "', '" + toSave.getAccountId() + "', " + toSave.getCategoryId() + ");" +
-                        "       EXCEPTION" +
-                        "           WHEN OTHERS THEN" +
-                        "               ROLLBACK;" +
-                        "               RAISE;" +
-                        "   END;" +
-                        "   COMMIT;" +
-                        "END $$;";
-            }
-            
-            if ("CREDIT".equals(toSave.getType())) {
-                return "DO $$" +
-                        "BEGIN" +
-                        "   BEGIN" +
-                        "       INSERT INTO \"balance_history\" (value, accountId) VALUES " +
-                        "           ( (" + accountRepository.getBalanceNow(toSave.getAccountId()).getValue() + " + " + toSave.getAmount() + "), " +
-                        "            '" + toSave.getAccountId() + "' );" +
-                        "       INSERT INTO \"transaction\" (label, amount, transactiontype, accountId, categoryId) VALUES " +
-                        "           ('" + toSave.getLabel() + "', " + toSave.getAmount() + ", '" + toSave.getType() + "', '" + toSave.getAccountId() + "', " + toSave.getCategoryId() + ");" +
-                        "       EXCEPTION" +
-                        "           WHEN OTHERS THEN" +
-                        "               ROLLBACK;" +
-                        "               RAISE;" +
-                        "   END;" +
-                        "   COMMIT;" +
-                        "END $$;";
-            }
-        }
-        
-        if (obj.getClass().equals(Transfert.class)) {
-            Transfert toSave = (Transfert) obj;
-            return "INSERT INTO \"transfert\" (id, amount, accountid1, accountid2) VALUES " +
-                "( '" + toSave.getId() + "', " + toSave.getAmount() + ", '" + toSave.getDebtorId() + "' , '" + toSave.getCreditorId() + "' ) ;";
-        }
-
-        return null;
-    }
 }
