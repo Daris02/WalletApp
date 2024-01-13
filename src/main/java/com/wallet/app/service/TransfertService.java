@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.wallet.app.model.Currency;
 import com.wallet.app.model.CurrencyValue;
@@ -26,6 +28,7 @@ public class TransfertService {
         Integer currencyDebitorId = accountService.getAccountById(debtorId).getCurrencyId();
         Integer currencyCreditorId = accountService.getAccountById(creditorId).getCurrencyId();
         Double finalAmount = 0.0;
+        Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now());
         
         if (debtorId == creditorId) {
             System.out.println("Transfer failed: an account can't do transfer to himself.");
@@ -90,7 +93,7 @@ public class TransfertService {
         if (transfert.getId() == null) {
             transfert.setId(UUID.randomUUID().toString());
         }
-        
+        transfert.setDateTime(timestamp);
         return transfertRepository.save(transfert);
     }
     
