@@ -2,8 +2,8 @@ package com.wallet.app.repository;
 
 import java.util.List;
 
-public interface Crud<T> {
-    T getById(String id);
+public interface Crud<T, ID> {
+    T getById(ID id);
 
     List<T> findAll();
 
