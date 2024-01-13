@@ -16,6 +16,8 @@ public abstract class AutoCrud<T, ID> implements Crud<T, ID>{
 
     protected abstract String getTableName();
     
+    protected abstract T mapResultSetToEntity(ResultSet resultSet);
+    
     @Override
     public T getById(ID id) {
         Connection connection = null;
@@ -131,7 +133,6 @@ public abstract class AutoCrud<T, ID> implements Crud<T, ID>{
     
                 String insertQuery = queryBuilder.toString();
 
-            // System.out.println(insertQuery);
             statement.executeUpdate(insertQuery);
             return toSave;
 
@@ -147,48 +148,4 @@ public abstract class AutoCrud<T, ID> implements Crud<T, ID>{
             }
         }
     }
-
-    protected abstract T mapResultSetToEntity(ResultSet resultSet);
-
-    // private static String createSql(Object obj) {
-    //     if (obj.getClass().equals(Transaction.class)) {
-    //         Transaction toSave = (Transaction) obj;
-
-    //         if ("DEBIT".equals(toSave.getType())) {
-    //             return "DO $$" +
-    //                     "BEGIN" +
-    //                     "   BEGIN" +
-    //                     "       INSERT INTO \"balance_history\" (value, accountId) VALUES " +
-    //                     "           ( (" + accountRepository.getBalanceNow(toSave.getAccountId()).getValue() + " - " + toSave.getAmount() + "), " +
-    //                     "              '" + toSave.getAccountId() + "' );" +
-    //                     "       INSERT INTO \"transaction\" (label, amount, transactiontype, accountId,  categoryId) VALUES " +
-    //                     "           ('" + toSave.getLabel() + "', " + toSave.getAmount() + ", '" + toSave.getType() + "', '" + toSave.getAccountId() + "', " + toSave.getCategoryId() + ");" +
-    //                     "       EXCEPTION" +
-    //                     "           WHEN OTHERS THEN" +
-    //                     "               ROLLBACK;" +
-    //                     "               RAISE;" +
-    //                     "   END;" +
-    //                     "   COMMIT;" +
-    //                     "END $$;";
-    //         }
-            
-    //         if ("CREDIT".equals(toSave.getType())) {
-    //             return "DO $$" +
-    //                     "BEGIN" +
-    //                     "   BEGIN" +
-    //                     "       INSERT INTO \"balance_history\" (value, accountId) VALUES " +
-    //                     "           ( (" + accountRepository.getBalanceNow(toSave.getAccountId()).getValue() + " + " + toSave.getAmount() + "), " +
-    //                     "            '" + toSave.getAccountId() + "' );" +
-    //                     "       INSERT INTO \"transaction\" (label, amount, transactiontype, accountId, categoryId) VALUES " +
-    //                     "           ('" + toSave.getLabel() + "', " + toSave.getAmount() + ", '" + toSave.getType() + "', '" + toSave.getAccountId() + "', " + toSave.getCategoryId() + ");" +
-    //                     "       EXCEPTION" +
-    //                     "           WHEN OTHERS THEN" +
-    //                     "               ROLLBACK;" +
-    //                     "               RAISE;" +
-    //                     "   END;" +
-    //                     "   COMMIT;" +
-    //                     "END $$;";
-    //         }
-    //     }
-        
 }
