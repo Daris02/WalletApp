@@ -11,25 +11,24 @@ import java.util.UUID;
 import com.wallet.app.model.Account;
 import com.wallet.app.model.Balance;
 import com.wallet.app.model.Category;
-import com.wallet.app.model.Currency;
 import com.wallet.app.model.Transaction;
 import com.wallet.app.repository.AccountRepository;
+import com.wallet.app.repository.BalanceRepository;
 import com.wallet.app.repository.CategoryRepository;
 
 public class AccountService {
     private AccountRepository accountRepo = new AccountRepository();
-    private CurrencyService currencyService = new CurrencyService();
+    private BalanceRepository balanceRepo = new BalanceRepository();
     private TransactionService transactionService = new TransactionService();
     private CategoryRepository categoryRepo = new CategoryRepository();
 
     public Account getAccountById(String id) {
         Account account = accountRepo.getById(id);
         List<Transaction> transactionsList = transactionService.getAllTransactionsByAccoundId(id);
-        account.setBalance(accountRepo.getBalanceNow(id).getValue());
+        account.setBalance(balanceRepo.getBalanceNow(id).getValue());
         if (transactionsList != null) {
             account.setTransactionList(transactionsList);
         }
-
         return account;
     }
 
@@ -37,7 +36,7 @@ public class AccountService {
         List<Account> accounts = accountRepo.findAll();
         for (Account account : accounts) {
             List<Transaction> transactionsList = transactionService.getAllTransactionsByAccoundId(account.getId());
-            account.setBalance(accountRepo.getBalanceNow(account.getId()).getValue());
+            account.setBalance(balanceRepo.getBalanceNow(account.getId()).getValue());
             if (transactionsList != null) {
                 account.setTransactionList(transactionsList);
             }
@@ -45,15 +44,15 @@ public class AccountService {
         return accounts;
     }
 
-    public Account saveAccount(Account account, String currencyCode) {
+    public Account saveAccount(Account account) {
         if (account.getId() == null) {
             account.setId(UUID.randomUUID().toString());
         }
-        for (Currency curr : currencyService.getAllCurrencies()) {
-            if(curr.getCode().equals(currencyCode)) {
-                account.setCurrency(curr);
-            }
-        }
+        Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now());
+
+        account.setCreationDate(timestamp);
+        account.setBalance(0.0);
+        balanceRepo.save(new Balance(UUID.randomUUID().toString(), 0.0, timestamp, account.getId()));
         return accountRepo.save(account);
     }
 
@@ -62,13 +61,13 @@ public class AccountService {
     }
 
     public List<Balance> getBalancesHistory(String id) {
-        return accountRepo.getBalanceHistory(id, null, null);
+        return balanceRepo.getBalanceHistory(id, null, null);
     }
     
     public List<Balance> getBalancesHistoryWithDate(String id, LocalDateTime startDatetime, LocalDateTime endDatetime) {
         Timestamp start = Timestamp.valueOf(startDatetime);
         Timestamp end = Timestamp.valueOf(endDatetime);
-        return accountRepo.getBalanceHistory(id, start, end);
+        return balanceRepo.getBalanceHistory(id, start, end);
     }
 
     public Map<String, Double> getAllTotalSpendAmounts(String accountId, LocalDateTime start, LocalDateTime end) {
