@@ -22,6 +22,7 @@ public class Main {
         CurrencyService curr = new CurrencyService();
             // System.out.println(curr.saveCurrency(new Currency("Ariary", "MGA")));
             // System.out.println(curr.saveCurrency(new Currency("Euro", "EUR")));
+            // System.out.println(curr.saveCurrency(new Currency("Dollar US", "USD")));
             // System.out.println(curr.getAllCurrencies());
             // System.out.println(curr.getCurrencyById(1));
             // System.out.println(curr.getAllCurrencyValues());
@@ -73,10 +74,10 @@ public class Main {
         LocalDateTime end = LocalDateTime.of(2024, 1, 14, 8, 0, 0);
             
             // --- SQL
-            System.out.println(acc.getAllTotalSpendAmounts(id1, start, end));
+            // System.out.println(acc.getAllTotalSpendAmounts(id1, start, end));
             
             // --- Java Only
-            System.out.println(acc.findAllTotalSpendAmounts(id1, start, end));
+            // System.out.println(acc.findAllTotalSpendAmounts(id1, start, end));
 
     }
 }

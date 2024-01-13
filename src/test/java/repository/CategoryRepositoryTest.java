@@ -14,6 +14,6 @@ public class CategoryRepositoryTest {
     @Test
     void getById() {
         Category category = new Category(1, "Transfert");
-        assertEquals(category, repo.getById("1"));
+        assertEquals(category, repo.getById(1));
     }
 }
