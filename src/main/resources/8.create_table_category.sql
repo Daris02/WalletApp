@@ -80,4 +80,5 @@ INSERT INTO "category" (id, name) VALUES
 (71, 'Refunds'),
 (72, 'Rental income'),
 (73, 'Sale'),
-(74, 'Wage, invoices');
+(74, 'Wage, invoices'),
+(75, 'Salary');
