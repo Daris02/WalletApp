@@ -5,6 +5,6 @@ CREATE TABLE IF NOT EXISTS "transfert" (
     id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
     amount DECIMAL DEFAULT 0,
     datetime TIMESTAMP DEFAULT current_timestamp,
-    accountId1 uuid REFERENCES "account"(id) NOT NULL,
-    accountId2 uuid REFERENCES "account"(id) NOT NULL
+    debtorId uuid REFERENCES "account"(id) NOT NULL,
+    creditorId uuid REFERENCES "account"(id) NOT NULL
 );

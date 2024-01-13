@@ -12,10 +12,10 @@ import lombok.*;
 @EqualsAndHashCode
 public class Transfert {
     private String id;
-    private String debtorId;
-    private String creditorId;
     private Double amount;
     private Timestamp dateTime;
+    private String debtorId;
+    private String creditorId;
 
     public Transfert(String debtorId, String creditorId, Double amount) {
         this.debtorId = debtorId;
