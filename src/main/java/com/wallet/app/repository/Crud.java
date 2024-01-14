@@ -10,4 +10,6 @@ public interface Crud<T, ID> {
     List<T> saveAll(List<T> toSave);
 
     T save(T toSave);
+
+    void removeById(ID id);
 }

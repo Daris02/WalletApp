@@ -15,13 +15,13 @@ import com.wallet.app.model.Transfert;
 import com.wallet.app.repository.TransfertRepository;
 
 public class TransfertService {
-    TransfertRepository transfertRepository = new TransfertRepository();
+    TransfertRepository transfertRepo = new TransfertRepository();
     TransactionService transactionService = new TransactionService();
     AccountService accountService = new AccountService();
     CurrencyService currencyService = new CurrencyService();
 
     public List<Transfert> getAllTransferts() {
-        return transfertRepository.findAll();
+        return transfertRepo.findAll();
     }
     
     public Transfert saveTransfert(String debtorId, String creditorId, Double amount, String currencyValueChoice) {
@@ -94,8 +94,11 @@ public class TransfertService {
             transfert.setId(UUID.randomUUID().toString());
         }
         transfert.setDateTime(timestamp);
-        return transfertRepository.save(transfert);
+        return transfertRepo.save(transfert);
     }
     
+    public void removeById(String id) {
+        transfertRepo.removeById(id);
+    }
 }
  

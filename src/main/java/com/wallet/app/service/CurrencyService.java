@@ -29,6 +29,10 @@ public class CurrencyService {
         return currencyRepo.saveAll(currencies);
     }
 
+    public void removeById(Integer id) {
+        currencyRepo.removeById(id);
+    }
+
     public List<CurrencyValue> getAllCurrencyValues() {
         return currencyValueRepo.findAll();
     }

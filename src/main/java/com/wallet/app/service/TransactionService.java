@@ -66,4 +66,8 @@ public class TransactionService {
     public List<Transaction> getAllTransactionsByAccoundId(String id) {
         return transactionRepo.findAllByAccountId(id);
     }
+
+    public void removeById(String id) {
+        transactionRepo.removeById(id);
+    }
 }

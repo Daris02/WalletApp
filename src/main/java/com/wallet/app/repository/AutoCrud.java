@@ -148,4 +148,39 @@ public abstract class AutoCrud<T, ID> implements Crud<T, ID>{
             }
         }
     }
+    
+    @Override
+    public void removeById(ID id) {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        UUID _id;
+        String deleteQuery = "DELETE FROM " + getTableName() + " WHERE id = ?";
+
+        try {
+            connection = ConnectionDB.createConnection();
+            preparedStatement = connection.prepareStatement(deleteQuery);
+            
+            if (id.getClass().equals(deleteQuery.getClass())) {
+                _id = UUID.fromString((String) id);
+                preparedStatement.setObject(1, _id);
+            } else {
+                preparedStatement.setObject(1, id);
+            }
+            
+            preparedStatement.executeUpdate();
+            System.out.println("Finish delete with success");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+
+        } finally {
+            try {
+                if (resultSet != null) resultSet.close();
+                if (preparedStatement != null) preparedStatement.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
 }
