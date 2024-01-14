@@ -1,26 +1,39 @@
 package repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 
 import com.wallet.app.model.Account;
-import com.wallet.app.repository.AccountRepository;
+import com.wallet.app.service.AccountService;
 
-
+@TestInstance(value = Lifecycle.PER_CLASS)
 public class AccountRepositoryTest {
-    AccountRepository repo = new AccountRepository();
+    AccountService serivce = new AccountService();
+    Account accountTest;
+
+    @BeforeAll
+    public void before() {
+        accountTest = serivce.saveAccount(new Account( "Account 1", "Bank", 1));
+    }
+
+    @AfterAll
+    public void after() {
+        serivce.removeById(accountTest.getId());
+    }
 
     @Test
     void save() {
-        // Account account = new Account("f028d677-18fb-4e00-af96-e482e54236a1", "Account 1", 0);
-        // repo.save(account);
-        // assertEquals(account.getName(), repo.getById("f028d677-18fb-4e00-af96-e482e54236a1").getName());
+        assertEquals(accountTest.getName(), serivce.getAccountById(accountTest.getId()).getName());
     }
     
     @Test
     void getById() {
-        Account account = new Account();
-        assertEquals(account.getClass(), repo.getById("f028d677-18fb-4e00-af96-e482e54236a1").getClass());
+        assertNotNull(serivce.getAccountById(accountTest.getId()));
     }
 }
